@@ -80,17 +80,17 @@
     <!-- Header -->
     <header class="flex items-start justify-between mb-5">
       <div>
-        <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">
+        <div id="liveIndicator" class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-400 mb-1">
           <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
           </span>
-          Ancón Surf Report • En Vivo
+          Conectando con Satélite...
         </div>
         <h1 id="spotTitle" class="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white">Las Conchitas</h1>
-        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5">Point Break Izquierda • Cargando...</p>
+        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5">Point Break Izquierda • Ancón</p>
       </div>
-      <button onclick="fetchSurfData()" title="Actualizar reporte" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 active:scale-95 transition">
+      <button onclick="fetchSurfData()" title="Actualizar reporte en vivo" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 active:scale-95 transition">
         <svg id="refreshIcon" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
@@ -130,9 +130,9 @@
 
           <div id="waveCard" class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0d131f] border border-slate-800/90 p-5 lg:p-6 shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between mb-4">
-              <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                Condición Limpia / Tubero
+              <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                Sincronizando...
               </span>
               <span id="cardSwellDir" class="text-xs font-medium text-slate-400">Swell --</span>
             </div>
@@ -154,7 +154,7 @@
 
             <div class="mt-4 pt-3.5 border-t border-slate-800/80">
               <p id="cardComment" class="text-xs lg:text-sm leading-relaxed text-slate-300 italic">
-                "Cargando pronóstico de olas..."
+                "Obteniendo lectura en vivo de boyas y modelos marinos..."
               </p>
             </div>
           </div>
@@ -172,13 +172,13 @@
       <div>
         <section>
           <div class="flex items-center justify-between mb-3 px-1">
-            <h2 class="text-xs lg:text-sm font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario (06:00 – 23:00)</h2>
+            <h2 class="text-xs lg:text-sm font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario Real (06:00 – 23:00)</h2>
             <span class="text-[11px] lg:text-xs text-slate-500">Toca para desplegar</span>
           </div>
 
           <div id="accordionsContainer" class="space-y-3">
             <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
-              Conectando con boyas de Ancón...
+              Descargando datos en tiempo real de Open-Meteo...
             </div>
           </div>
         </section>
@@ -187,13 +187,12 @@
     </div>
 
     <footer class="mt-12 text-center text-[11px] lg:text-xs text-slate-500">
-      Datos en tiempo real vía Open-Meteo Marine & Weather API • Ancón, Perú
+      Datos 100% en tiempo real vía Open-Meteo Marine & Weather API • Ancón, Perú
     </footer>
 
   </div>
 
   <script>
-    // Coordenadas ajustadas mar adentro (offshore) para garantizar lectura marina válida en Open-Meteo
     const SPOTS = {
       conchitas: { name: "Las Conchitas", subtitle: "Point Break Izquierda • Ancón", lat: -11.77, lon: -77.21, factor: 1.0 },
       rocas: { name: "Las Rocas", subtitle: "Reef / Orillero Pesado • Ancón", lat: -11.78, lon: -77.22, factor: 1.15 },
@@ -293,15 +292,49 @@
 
       const cond = evaluateCondition(parseFloat(avgH), avgP, avgW, midSample.windDir);
 
-      document.getElementById('cardWaveHeight').textContent = `${avgH}m`; document.getElementById('cardWavePeriod').textContent = `${avgP}s`;
-      document.getElementById('cardWindSpeed').textContent = `${avgW}`; document.getElementById('cardWindLabel').textContent = `Viento ${getCardinalDirection(midSample.windDir)} km/h`;
-      document.getElementById('cardSwellDir').textContent = `Swell ${Math.round(midSample.swellDir)}°${dirText}`;
+      document.getElementById('cardWaveHeight').textContent = `${avgH}m`;
+      document.getElementById('cardWavePeriod').textContent = `${avgP}s`;
+      document.getElementById('cardWindSpeed').textContent = `${avgW}`;
+      document.getElementById('cardWindLabel').textContent = `Viento ${getCardinalDirection(midSample.windDir)} km/h`;
+      document.getElementById('cardSwellDir').textContent = `Swell ${Math.round(midSample.swellDir)}° ${dirText}`;
       document.getElementById('cardComment').textContent = cond.comment;
 
       const badge = document.getElementById('cardConditionBadge');
       badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold border ${cond.badgeClass}`;
-      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`; }  function toggleAccordion(dayIndex) { const content = document.getElementById(`acc-content-${dayIndex}`);
-      const icon = document.getElementById(`acc-icon-${dayIndex}`); content.classList.toggle('open'); icon.classList.toggle('rotated'); }  function formatDayHeader(dateStr, index) { const dateObj = new Date(dateStr + 'T12:00:00'); const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']; const dayName = days[dateObj.getDay()]; const dayNum = dateObj.getDate(); const monthName = months[dateObj.getMonth()]; const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : ''; return `${dayName} ${dayNum}${monthName}${tag}`; }  function renderAccordions() { const container = document.getElementById('accordionsContainer'); container.innerHTML = '';  forecastDays.forEach((day, idx) => { const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1); const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length); const isFirst = idx === 0;  const rowsHtml = day.hours.map(h => { const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir); const barPct = Math.min(100, Math.round((h.height / 2.5) * 100)); const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
+      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`;
+    }
+
+    function toggleAccordion(dayIndex) {
+      const content = document.getElementById(`acc-content-${dayIndex}`);
+      const icon = document.getElementById(`acc-icon-${dayIndex}`);
+      content.classList.toggle('open');
+      icon.classList.toggle('rotated');
+    }
+
+    function formatDayHeader(dateStr, index) {
+      const dateObj = new Date(dateStr + 'T12:00:00');
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const dayName = days[dateObj.getDay()];
+      const dayNum = dateObj.getDate();
+      const monthName = months[dateObj.getMonth()];
+      const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : '';
+      return `${dayName} ${dayNum} ${monthName}${tag}`;
+    }
+
+    function renderAccordions() {
+      const container = document.getElementById('accordionsContainer');
+      container.innerHTML = '';
+
+      forecastDays.forEach((day, idx) => {
+        const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1);
+        const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length);
+        const isFirst = idx === 0;
+
+        const rowsHtml = day.hours.map(h => {
+          const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir);
+          const barPct = Math.min(100, Math.round((h.height / 2.5) * 100));
+          const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
           const windCardinal = getCardinalDirection(h.windDir);
 
           return `
@@ -318,4 +351,123 @@
               </div>
               <div class="col-span-4 text-center text-slate-300">
                 <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
-                <span
+                <span class="text-[10px] lg:text-xs text-slate-500 ml-1">${windCardinal}</span>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-900 border border-slate-800" title="${cond.label}">
+                  <span class="w-2 h-2 rounded-full ${cond.dotColor}"></span>
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const cardHtml = `
+          <div class="rounded-2xl bg-[#101724] border border-slate-800/90 overflow-hidden shadow-md">
+            <button onclick="toggleAccordion(${idx})" class="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/30 transition">
+              <div>
+                <div class="font-display font-bold text-sm lg:text-base text-white">${formatDayHeader(day.date, idx)}</div>
+                <div class="text-[11px] lg:text-xs text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                  ${maxH}m
+                </span>
+                <svg id="acc-icon-${idx}" class="chevron-icon w-4 h-4 text-slate-400 ${isFirst ? 'rotated' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </button>
+            <div id="acc-content-${idx}" class="accordion-content ${isFirst ? 'open' : ''} border-t border-slate-800/80 bg-[#0b101b]">
+              <div class="grid grid-cols-12 px-4 py-2.5 text-[10px] lg:text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
+                <div class="col-span-2">Hora</div>
+                <div class="col-span-4">Ola / Período</div>
+                <div class="col-span-4 text-center">Viento</div>
+                <div class="col-span-2 text-right">Estado</div>
+              </div>
+              ${rowsHtml}
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    async function fetchSurfData() {
+      const icon = document.getElementById('refreshIcon');
+      const liveIndicator = document.getElementById('liveIndicator');
+      icon.classList.add('animate-spin');
+
+      const spot = SPOTS[currentSpotKey];
+      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wave_height,wave_period,wave_direction&timezone=America%2FLima&forecast_days=3`;
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wind_speed_10m,wind_direction_10m&timezone=America%2FLima&forecast_days=3`;
+
+      try {
+        const [marineRes, weatherRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+        if (!marineRes.ok || !weatherRes.ok) throw new Error(`HTTP ${marineRes.status}`);
+
+        const marineData = await marineRes.json();
+        const weatherData = await weatherRes.json();
+
+        const times = marineData.hourly.time;
+        const grouped = {};
+
+        times.forEach((isoTime, i) => {
+          const [datePart, timePart] = isoTime.split('T');
+          const hourNum = parseInt(timePart.split(':')[0], 10);
+
+          if (hourNum >= 6 && hourNum <= 23) {
+            if (!grouped[datePart]) grouped[datePart] = [];
+            const rawH = marineData.hourly.wave_height[i];
+            if (rawH !== null && rawH !== undefined) {
+              grouped[datePart].push({
+                hourNum,
+                height: rawH * spot.factor,
+                period: Math.round(marineData.hourly.wave_period[i]),
+                swellDir: marineData.hourly.wave_direction[i],
+                windSpeed: weatherData.hourly.wind_speed_10m[i],
+                windDir: weatherData.hourly.wind_direction_10m[i]
+              });
+            }
+          }
+        });
+
+        forecastDays = Object.keys(grouped).slice(0, 3).map(date => ({
+          date,
+          hours: grouped[date]
+        }));
+
+        if (forecastDays.length > 0 && forecastDays[0].hours.length > 0) {
+          liveIndicator.className = "flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-1";
+          liveIndicator.innerHTML = `
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            EN VIVO • SATÉLITE OPEN-METEO
+          `;
+          document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • ${formatDayHeader(forecastDays[0].date, 0)}`;
+          updateShiftCard();
+          renderAccordions();
+        } else {
+          throw new Error("Sin datos marinos en estas coordenadas");
+        }
+      } catch (err) {
+        console.error("Error obteniendo datos reales:", err);
+        liveIndicator.className = "flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-rose-400 mb-1";
+        liveIndicator.innerHTML = `<span class="h-2 w-2 rounded-full bg-rose-500"></span> ERROR DE CONEXIÓN`;
+        document.getElementById('accordionsContainer').innerHTML = `
+          <div class="p-5 rounded-2xl bg-rose-950/30 border border-rose-800/50 text-xs text-rose-300 text-center space-y-2">
+            <p class="font-semibold">No se pudo conectar con Open-Meteo (${err.message}).</p>
+            <p class="text-slate-400">Si usas Brave, desactiva el escudo para esta página o verifica tu conexión a internet.</p>
+          </div>
+        `;
+      } finally {
+        setTimeout(() => icon.classList.remove('animate-spin'), 400);
+      }
+    }
+
+    fetchSurfData();
+  </script>
+</body>
+</html>
