@@ -55,7 +55,6 @@
       transform: rotate(180deg);
     }
 
-    /* Diseño responsivo adaptado para PC y Celular */
     @media (min-width: 1024px) {
       .app-container {
         max-width: 1100px !important;
@@ -89,7 +88,7 @@
           Ancón Surf Report • En Vivo
         </div>
         <h1 id="spotTitle" class="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white">Las Conchitas</h1>
-        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5">Point Break Izquierda • Cargando fecha...</p>
+        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5">Point Break Izquierda • Cargando...</p>
       </div>
       <button onclick="fetchSurfData()" title="Actualizar reporte" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 active:scale-95 transition">
         <svg id="refreshIcon" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -179,7 +178,7 @@
 
           <div id="accordionsContainer" class="space-y-3">
             <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
-              Conectando con Open-Meteo...
+              Conectando con boyas de Ancón...
             </div>
           </div>
         </section>
@@ -194,10 +193,11 @@
   </div>
 
   <script>
+    // Coordenadas ajustadas mar adentro (offshore) para garantizar lectura marina válida en Open-Meteo
     const SPOTS = {
-      conchitas: { name: "Las Conchitas", subtitle: "Point Break Izquierda • Ancón", lat: -11.774, lon: -77.176, factor: 1.0 },
-      rocas: { name: "Las Rocas", subtitle: "Reef / Orillero Pesado • Ancón", lat: -11.779, lon: -77.181, factor: 1.12 },
-      pasamayo: { name: "Pasamayo", subtitle: "Beach Break Expuesto • Norte", lat: -11.635, lon: -77.255, factor: 1.25 }
+      conchitas: { name: "Las Conchitas", subtitle: "Point Break Izquierda • Ancón", lat: -11.77, lon: -77.21, factor: 1.0 },
+      rocas: { name: "Las Rocas", subtitle: "Reef / Orillero Pesado • Ancón", lat: -11.78, lon: -77.22, factor: 1.15 },
+      pasamayo: { name: "Pasamayo", subtitle: "Beach Break Expuesto • Norte", lat: -11.64, lon: -77.29, factor: 1.30 }
     };
 
     const SHIFTS = [
@@ -237,19 +237,19 @@
 
     function getCardinalDirection(deg) {
       const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
-      return dirs[Math.round(deg / 22.5) % 16];
+      return dirs[Math.round((deg || 0) / 22.5) % 16];
     }
 
     function evaluateCondition(height, period, windSpeed, windDeg) {
       const isOffshore = windDeg >= 65 && windDeg <= 155;
-      if (period >= 14 && height >= 1.1 && (isOffshore || windSpeed <= 13)) {
+      if (period >= 14 && height >= 1.1 && (isOffshore || windSpeed <= 14)) {
         return {
           label: "Limpio / Tubero",
           dotColor: "bg-emerald-400",
           badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
           comment: `"Buena energía de fondo (${period}s) y viento suave. Paredes limpias ideales para buscar tubo o tirar un buen rolo."`
         };
-      } else if (period >= 12 && windSpeed <= 19) {
+      } else if (period >= 12 && windSpeed <= 20) {
         return {
           label: "Corrible / Maniobrable",
           dotColor: "bg-amber-400",
@@ -275,4 +275,47 @@
       document.querySelectorAll('.shift-dot').forEach((dot, i) => {
         if (i === currentShiftIndex) {
           dot.classList.remove('w-1.5', 'bg-slate-700');
-          dot.classList.add('w
+          dot.classList.add('w-5', 'bg-sky-400');
+        } else {
+          dot.classList.remove('w-5', 'bg-sky-400');
+          dot.classList.add('w-1.5', 'bg-slate-700');
+        }
+      });
+
+      const matching = todayHours.filter(h => shift.hours.includes(h.hourNum));
+      if (!matching.length) return;
+
+      const avgH = (matching.reduce((s, x) => s + x.height, 0) / matching.length).toFixed(1);
+      const avgP = Math.round(matching.reduce((s, x) => s + x.period, 0) / matching.length);
+      const avgW = Math.round(matching.reduce((s, x) => s + x.windSpeed, 0) / matching.length);
+      const midSample = matching[Math.floor(matching.length / 2)];
+      const dirText = getCardinalDirection(midSample.swellDir);
+
+      const cond = evaluateCondition(parseFloat(avgH), avgP, avgW, midSample.windDir);
+
+      document.getElementById('cardWaveHeight').textContent = `${avgH}m`; document.getElementById('cardWavePeriod').textContent = `${avgP}s`;
+      document.getElementById('cardWindSpeed').textContent = `${avgW}`; document.getElementById('cardWindLabel').textContent = `Viento ${getCardinalDirection(midSample.windDir)} km/h`;
+      document.getElementById('cardSwellDir').textContent = `Swell ${Math.round(midSample.swellDir)}°${dirText}`;
+      document.getElementById('cardComment').textContent = cond.comment;
+
+      const badge = document.getElementById('cardConditionBadge');
+      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold border ${cond.badgeClass}`;
+      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`; }  function toggleAccordion(dayIndex) { const content = document.getElementById(`acc-content-${dayIndex}`);
+      const icon = document.getElementById(`acc-icon-${dayIndex}`); content.classList.toggle('open'); icon.classList.toggle('rotated'); }  function formatDayHeader(dateStr, index) { const dateObj = new Date(dateStr + 'T12:00:00'); const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']; const dayName = days[dateObj.getDay()]; const dayNum = dateObj.getDate(); const monthName = months[dateObj.getMonth()]; const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : ''; return `${dayName} ${dayNum}${monthName}${tag}`; }  function renderAccordions() { const container = document.getElementById('accordionsContainer'); container.innerHTML = '';  forecastDays.forEach((day, idx) => { const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1); const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length); const isFirst = idx === 0;  const rowsHtml = day.hours.map(h => { const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir); const barPct = Math.min(100, Math.round((h.height / 2.5) * 100)); const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
+          const windCardinal = getCardinalDirection(h.windDir);
+
+          return `
+            <div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 last:border-none text-xs lg:text-sm hover:bg-slate-800/30 transition">
+              <div class="col-span-2 font-mono font-semibold text-slate-300">${hourLabel}</div>
+              <div class="col-span-4 pr-3">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-display font-bold text-white">${h.height.toFixed(1)}m</span>
+                  <span class="text-[10px] lg:text-xs text-sky-400 font-semibold">${h.period}s</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full" style="width: ${barPct}%"></div>
+                </div>
+              </div>
+              <div class="col-span-4 text-center text-slate-300">
+                <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
+                <span
