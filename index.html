@@ -19,7 +19,7 @@
       --accent-emerald: #10b981;
     }
     body {
-      background-color: var--bg-dark;
+      background-color: var(--bg-dark);
       color: #f8fafc;
       font-family: 'Inter', sans-serif;
       -webkit-tap-highlight-color: transparent;
@@ -55,7 +55,7 @@
       transform: rotate(180deg);
     }
 
-    /* Adaptabilidad Pro para Computadora (Pantallas grandes) */
+    /* Diseño responsivo adaptado para PC y Celular */
     @media (min-width: 1024px) {
       .app-container {
         max-width: 1100px !important;
@@ -76,7 +76,6 @@
 </head>
 <body class="min-h-screen pb-14 selection:bg-sky-500 selection:text-white">
 
-  <!-- Main Container -->
   <div class="app-container max-w-md mx-auto px-4 pt-6">
 
     <!-- Header -->
@@ -112,10 +111,10 @@
       </button>
     </nav>
 
-    <!-- Desktop Grid Structure (Sidebar Izquierdo para Tarjeta / Columna Derecha para Acordeones en PC) -->
+    <!-- Desktop Grid Layout -->
     <div class="desktop-grid">
 
-      <!-- Panel Izquierdo / Móvil Principal: Tarjeta de Sesión -->
+      <!-- Left Panel: Main Card -->
       <div class="desktop-sticky-panel mb-6 lg:mb-0">
         <section>
           <div class="flex items-center justify-between mb-2.5 px-1">
@@ -130,17 +129,15 @@
             </button>
           </div>
 
-          <!-- Main Editorial Card -->
           <div id="waveCard" class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0d131f] border border-slate-800/90 p-5 lg:p-6 shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between mb-4">
               <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 Condición Limpia / Tubero
               </span>
-              <span id="cardSwellDir" class="text-xs font-medium text-slate-400">Swell 210° SSO</span>
+              <span id="cardSwellDir" class="text-xs font-medium text-slate-400">Swell --</span>
             </div>
 
-            <!-- Big Metrics -->
             <div class="grid grid-cols-3 divide-x divide-slate-800/80 text-center my-3">
               <div class="px-2">
                 <div id="cardWaveHeight" class="font-display text-3xl lg:text-4xl font-bold text-white tracking-tight">--m</div>
@@ -156,15 +153,13 @@
               </div>
             </div>
 
-            <!-- Commentary -->
             <div class="mt-4 pt-3.5 border-t border-slate-800/80">
               <p id="cardComment" class="text-xs lg:text-sm leading-relaxed text-slate-300 italic">
-                "Calculando energía del swell y dirección del viento..."
+                "Cargando pronóstico de olas..."
               </p>
             </div>
           </div>
 
-          <!-- Pagination Dots -->
           <div class="flex items-center justify-center gap-2 mt-3">
             <button onclick="setShift(0)" id="dot-0" class="shift-dot h-1.5 w-5 rounded-full bg-sky-400 transition-all"></button>
             <button onclick="setShift(1)" id="dot-1" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
@@ -174,7 +169,7 @@
         </section>
       </div>
 
-      <!-- Panel Derecho / Sección Inferior: Pronóstico Horario 3 Días -->
+      <!-- Right Panel: Hourly Accordions -->
       <div>
         <section>
           <div class="flex items-center justify-between mb-3 px-1">
@@ -192,7 +187,6 @@
 
     </div>
 
-    <!-- Footer -->
     <footer class="mt-12 text-center text-[11px] lg:text-xs text-slate-500">
       Datos en tiempo real vía Open-Meteo Marine & Weather API • Ancón, Perú
     </footer>
@@ -281,143 +275,4 @@
       document.querySelectorAll('.shift-dot').forEach((dot, i) => {
         if (i === currentShiftIndex) {
           dot.classList.remove('w-1.5', 'bg-slate-700');
-          dot.classList.add('w-5', 'bg-sky-400');
-        } else {
-          dot.classList.remove('w-5', 'bg-sky-400');
-          dot.classList.add('w-1.5', 'bg-slate-700');
-        }
-      });
-
-      const matching = todayHours.filter(h => shift.hours.includes(h.hourNum));
-      if (!matching.length) return;
-
-      const avgH = (matching.reduce((s, x) => s + x.height, 0) / matching.length).toFixed(1);
-      const avgP = Math.round(matching.reduce((s, x) => s + x.period, 0) / matching.length);
-      const avgW = Math.round(matching.reduce((s, x) => s + x.windSpeed, 0) / matching.length);
-      const midSample = matching[Math.floor(matching.length / 2)];
-      const dirText = getCardinalDirection(midSample.swellDir);
-
-      const cond = evaluateCondition(parseFloat(avgH), avgP, avgW, midSample.windDir);
-
-      document.getElementById('cardWaveHeight').textContent = `${avgH}m`;
-      document.getElementById('cardWavePeriod').textContent = `${avgP}s`;
-      document.getElementById('cardWindSpeed').textContent = `${avgW}`;
-      document.getElementById('cardWindLabel').textContent = `Viento ${getCardinalDirection(midSample.windDir)} km/h`;
-      document.getElementById('cardSwellDir').textContent = `Swell ${Math.round(midSample.swellDir)}° ${dirText}`;
-      document.getElementById('cardComment').textContent = cond.comment;
-
-      const badge = document.getElementById('cardConditionBadge');
-      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold border ${cond.badgeClass}`;
-      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`;
-    }
-
-    function toggleAccordion(dayIndex) {
-      const content = document.getElementById(`acc-content-${dayIndex}`);
-      const icon = document.getElementById(`acc-icon-${dayIndex}`);
-      content.classList.toggle('open');
-      icon.classList.toggle('rotated');
-    }
-
-    function formatDayHeader(dateStr, index) {
-      const dateObj = new Date(dateStr + 'T12:00:00');
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      const dayName = days[dateObj.getDay()];
-      const dayNum = dateObj.getDate();
-      const monthName = months[dateObj.getMonth()];
-      const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : '';
-      return `${dayName} ${dayNum} ${monthName}${tag}`;
-    }
-
-    function renderAccordions() {
-      const container = document.getElementById('accordionsContainer');
-      container.innerHTML = '';
-
-      forecastDays.forEach((day, idx) => {
-        const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1);
-        const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length);
-        const isFirst = idx === 0;
-
-        const rowsHtml = day.hours.map(h => {
-          const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir);
-          const barPct = Math.min(100, Math.round((h.height / 2.5) * 100));
-          const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
-          const windCardinal = getCardinalDirection(h.windDir);
-
-          return `
-            <div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 last:border-none text-xs lg:text-sm hover:bg-slate-800/30 transition">
-              <div class="col-span-2 font-mono font-semibold text-slate-300">${hourLabel}</div>
-              <div class="col-span-4 pr-3">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="font-display font-bold text-white">${h.height.toFixed(1)}m</span>
-                  <span class="text-[10px] lg:text-xs text-sky-400 font-semibold">${h.period}s</span>
-                </div>
-                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full" style="width: ${barPct}%"></div>
-                </div>
-              </div>
-              <div class="col-span-4 text-center text-slate-300">
-                <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
-                <span class="text-[10px] lg:text-xs text-slate-500 ml-1">${windCardinal}</span>
-              </div>
-              <div class="col-span-2 flex justify-end">
-                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-900 border border-slate-800" title="${cond.label}">
-                  <span class="w-2 h-2 rounded-full ${cond.dotColor}"></span>
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        const cardHtml = `
-          <div class="rounded-2xl bg-[#101724] border border-slate-800/90 overflow-hidden shadow-md">
-            <button onclick="toggleAccordion(${idx})" class="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/30 transition">
-              <div>
-                <div class="font-display font-bold text-sm lg:text-base text-white">${formatDayHeader(day.date, idx)}</div>
-                <div class="text-[11px] lg:text-xs text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  ${maxH}m
-                </span>
-                <svg id="acc-icon-${idx}" class="chevron-icon w-4 h-4 text-slate-400 ${isFirst ? 'rotated' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </div>
-            </button>
-            <div id="acc-content-${idx}" class="accordion-content ${isFirst ? 'open' : ''} border-t border-slate-800/80 bg-[#0b101b]">
-              <div class="grid grid-cols-12 px-4 py-2.5 text-[10px] lg:text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
-                <div class="col-span-2">Hora</div>
-                <div class="col-span-4">Ola / Período</div>
-                <div class="col-span-4 text-center">Viento</div>
-                <div class="col-span-2 text-right">Estado</div>
-              </div>
-              ${rowsHtml}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
-      });
-    }
-
-    async function fetchSurfData() {
-      const icon = document.getElementById('refreshIcon');
-      icon.classList.add('animate-spin');
-
-      const spot = SPOTS[currentSpotKey];
-      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wave_height,wave_period,wave_direction&timezone=America%2FLima&forecast_days=3`;
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wind_speed_10m,wind_direction_10m&timezone=America%2FLima&forecast_days=3`;
-
-      try {
-        const [marineRes, weatherRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-        const marineData = await marineRes.json();
-        const weatherData = await weatherRes.json();
-
-        const times = marineData.hourly.time;
-        const grouped = {};
-
-        times.forEach((isoTime, i) => {
-          const [datePart, timePart] = isoTime.split('T');
-          const hourNum = parseInt(timePart.split(':')[0], 10);
-
-          if (hourNum >= 6 && hourNum <=
+          dot.classList.add('w
