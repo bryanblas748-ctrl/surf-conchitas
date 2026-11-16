@@ -19,7 +19,7 @@
       --accent-emerald: #10b981;
     }
     body {
-      background-color: var(--bg-dark);
+      background-color: var--bg-dark;
       color: #f8fafc;
       font-family: 'Inter', sans-serif;
       -webkit-tap-highlight-color: transparent;
@@ -27,7 +27,6 @@
     .font-display {
       font-family: 'Space Grotesk', sans-serif;
     }
-    /* Custom subtle scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -55,15 +54,33 @@
     .chevron-icon.rotated {
       transform: rotate(180deg);
     }
+
+    /* Adaptabilidad Pro para Computadora (Pantallas grandes) */
+    @media (min-width: 1024px) {
+      .app-container {
+        max-width: 1100px !important;
+        padding-top: 2.5rem;
+      }
+      .desktop-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+      .desktop-sticky-panel {
+        position: sticky;
+        top: 2rem;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen pb-14 selection:bg-sky-500 selection:text-white">
 
-  <!-- Main Container (Mobile-First Editorial Layout) -->
-  <div class="max-w-md mx-auto px-4 pt-6">
+  <!-- Main Container -->
+  <div class="app-container max-w-md mx-auto px-4 pt-6">
 
     <!-- Header -->
-    <header class="flex items-start justify-between mb-4">
+    <header class="flex items-start justify-between mb-5">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">
           <span class="relative flex h-2 w-2">
@@ -72,133 +89,121 @@
           </span>
           Ancón Surf Report • En Vivo
         </div>
-        <h1 id="spotTitle" class="font-display text-2xl font-bold tracking-tight text-white">Las Conchitas</h1>
-        <p id="spotSubtitle" class="text-xs text-slate-400 mt-0.5">Point Break Izquierda • Cargando fecha...</p>
+        <h1 id="spotTitle" class="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white">Las Conchitas</h1>
+        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5">Point Break Izquierda • Cargando fecha...</p>
       </div>
       <button onclick="fetchSurfData()" title="Actualizar reporte" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 active:scale-95 transition">
-        <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg id="refreshIcon" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       </button>
     </header>
 
-    <!-- Spot Selector Pills (Conchitas, Las Rocas, Pasamayo) -->
-    <nav class="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-slate-900/90 border border-slate-800/80 mb-5">
-      <button onclick="selectSpot('conchitas')" id="btn-conchitas" class="spot-btn py-2 px-2 rounded-xl text-xs font-semibold transition-all bg-sky-500 text-slate-950 shadow-sm">
+    <!-- Spot Selector Pills -->
+    <nav class="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-slate-900/90 border border-slate-800/80 mb-6">
+      <button onclick="selectSpot('conchitas')" id="btn-conchitas" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-semibold transition-all bg-sky-500 text-slate-950 shadow-sm">
         Las Conchitas
       </button>
-      <button onclick="selectSpot('rocas')" id="btn-rocas" class="spot-btn py-2 px-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all">
+      <button onclick="selectSpot('rocas')" id="btn-rocas" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-semibold text-slate-400 hover:text-white transition-all">
         Las Rocas
       </button>
-      <button onclick="selectSpot('pasamayo')" id="btn-pasamayo" class="spot-btn py-2 px-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all">
+      <button onclick="selectSpot('pasamayo')" id="btn-pasamayo" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-semibold text-slate-400 hover:text-white transition-all">
         Pasamayo
       </button>
     </nav>
 
-    <!-- Minimal Wave Card (Opción C Style - Shift Carousel) -->
-    <section class="mb-6">
-      <div class="flex items-center justify-between mb-2.5 px-1">
-        <button onclick="changeShift(-1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <span id="shiftBadge" class="text-[11px] font-bold tracking-wider uppercase text-sky-400">
-          SESIÓN MADRUGADA • 06:00 - 09:00
-        </span>
-        <button onclick="changeShift(1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </button>
-      </div>
+    <!-- Desktop Grid Structure (Sidebar Izquierdo para Tarjeta / Columna Derecha para Acordeones en PC) -->
+    <div class="desktop-grid">
 
-      <!-- Main Editorial Card -->
-      <div id="waveCard" class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0d131f] border border-slate-800/90 p-5 shadow-xl transition-all duration-300">
-        <!-- Top Condition Tag -->
-        <div class="flex items-center justify-between mb-4">
-          <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            Condición Limpia / Tubero
-          </span>
-          <span id="cardSwellDir" class="text-xs font-medium text-slate-400">Swell 210° SSO</span>
-        </div>
-
-        <!-- 3 Big Metrics -->
-        <div class="grid grid-cols-3 divide-x divide-slate-800/80 text-center my-2">
-          <div class="px-2">
-            <div id="cardWaveHeight" class="font-display text-3xl font-bold text-white tracking-tight">--m</div>
-            <div class="text-[11px] font-medium text-slate-400 mt-1">Olas</div>
+      <!-- Panel Izquierdo / Móvil Principal: Tarjeta de Sesión -->
+      <div class="desktop-sticky-panel mb-6 lg:mb-0">
+        <section>
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <button onclick="changeShift(-1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <span id="shiftBadge" class="text-[11px] lg:text-xs font-bold tracking-wider uppercase text-sky-400">
+              SESIÓN MADRUGADA • 06:00 - 09:00
+            </span>
+            <button onclick="changeShift(1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
           </div>
-          <div class="px-2">
-            <div id="cardWavePeriod" class="font-display text-3xl font-bold text-sky-400 tracking-tight">--s</div>
-            <div class="text-[11px] font-medium text-slate-400 mt-1">Período</div>
+
+          <!-- Main Editorial Card -->
+          <div id="waveCard" class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0d131f] border border-slate-800/90 p-5 lg:p-6 shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Condición Limpia / Tubero
+              </span>
+              <span id="cardSwellDir" class="text-xs font-medium text-slate-400">Swell 210° SSO</span>
+            </div>
+
+            <!-- Big Metrics -->
+            <div class="grid grid-cols-3 divide-x divide-slate-800/80 text-center my-3">
+              <div class="px-2">
+                <div id="cardWaveHeight" class="font-display text-3xl lg:text-4xl font-bold text-white tracking-tight">--m</div>
+                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Olas</div>
+              </div>
+              <div class="px-2">
+                <div id="cardWavePeriod" class="font-display text-3xl lg:text-4xl font-bold text-sky-400 tracking-tight">--s</div>
+                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Período</div>
+              </div>
+              <div class="px-2">
+                <div id="cardWindSpeed" class="font-display text-3xl lg:text-4xl font-bold text-slate-100 tracking-tight">--</div>
+                <div id="cardWindLabel" class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Viento km/h</div>
+              </div>
+            </div>
+
+            <!-- Commentary -->
+            <div class="mt-4 pt-3.5 border-t border-slate-800/80">
+              <p id="cardComment" class="text-xs lg:text-sm leading-relaxed text-slate-300 italic">
+                "Calculando energía del swell y dirección del viento..."
+              </p>
+            </div>
           </div>
-          <div class="px-2">
-            <div id="cardWindSpeed" class="font-display text-3xl font-bold text-slate-100 tracking-tight">--</div>
-            <div id="cardWindLabel" class="text-[11px] font-medium text-slate-400 mt-1">Viento km/h</div>
+
+          <!-- Pagination Dots -->
+          <div class="flex items-center justify-center gap-2 mt-3">
+            <button onclick="setShift(0)" id="dot-0" class="shift-dot h-1.5 w-5 rounded-full bg-sky-400 transition-all"></button>
+            <button onclick="setShift(1)" id="dot-1" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
+            <button onclick="setShift(2)" id="dot-2" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
+            <button onclick="setShift(3)" id="dot-3" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
           </div>
-        </div>
-
-        <!-- Tactical Bodyboard Commentary -->
-        <div class="mt-4 pt-3.5 border-t border-slate-800/80">
-          <p id="cardComment" class="text-xs leading-relaxed text-slate-300 italic">
-            "Calculando energía del swell y dirección del viento para tu próxima entrada al agua..."
-          </p>
-        </div>
+        </section>
       </div>
 
-      <!-- Pagination Dots -->
-      <div class="flex items-center justify-center gap-2 mt-3">
-        <button onclick="setShift(0)" id="dot-0" class="shift-dot h-1.5 w-5 rounded-full bg-sky-400 transition-all"></button>
-        <button onclick="setShift(1)" id="dot-1" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-        <button onclick="setShift(2)" id="dot-2" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-        <button onclick="setShift(3)" id="dot-3" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-      </div>
-    </section>
+      <!-- Panel Derecho / Sección Inferior: Pronóstico Horario 3 Días -->
+      <div>
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-xs lg:text-sm font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario (06:00 – 23:00)</h2>
+            <span class="text-[11px] lg:text-xs text-slate-500">Toca para desplegar</span>
+          </div>
 
-    <!-- 3-Day Hourly Breakdown Accordions (06:00 AM to 11:00 PM) -->
-    <section>
-      <div class="flex items-center justify-between mb-3 px-1">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario (06:00 – 23:00)</h2>
-        <span class="text-[11px] text-slate-500">Toca para desplegar</span>
+          <div id="accordionsContainer" class="space-y-3">
+            <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
+              Conectando con Open-Meteo...
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div id="accordionsContainer" class="space-y-3">
-        <!-- Populated dynamically via JS for Day 0 (Hoy), Day 1 (Mañana), Day 2 (Pasado) -->
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
-          Conectando con boyas y satélite Open-Meteo...
-        </div>
-      </div>
-    </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="mt-8 text-center text-[11px] text-slate-500">
+    <footer class="mt-12 text-center text-[11px] lg:text-xs text-slate-500">
       Datos en tiempo real vía Open-Meteo Marine & Weather API • Ancón, Perú
     </footer>
 
   </div>
 
   <script>
-    // Spots Configuration
     const SPOTS = {
-      conchitas: {
-        name: "Las Conchitas",
-        subtitle: "Point Break Izquierda • Ancón",
-        lat: -11.774,
-        lon: -77.176,
-        factor: 1.0
-      },
-      rocas: {
-        name: "Las Rocas",
-        subtitle: "Reef / Orillero Pesado • Ancón",
-        lat: -11.779,
-        lon: -77.181,
-        factor: 1.12
-      },
-      pasamayo: {
-        name: "Pasamayo",
-        subtitle: "Beach Break Expuesto • Norte",
-        lat: -11.635,
-        lon: -77.255,
-        factor: 1.25
-      }
+      conchitas: { name: "Las Conchitas", subtitle: "Point Break Izquierda • Ancón", lat: -11.774, lon: -77.176, factor: 1.0 },
+      rocas: { name: "Las Rocas", subtitle: "Reef / Orillero Pesado • Ancón", lat: -11.779, lon: -77.181, factor: 1.12 },
+      pasamayo: { name: "Pasamayo", subtitle: "Beach Break Expuesto • Norte", lat: -11.635, lon: -77.255, factor: 1.25 }
     };
 
     const SHIFTS = [
@@ -242,7 +247,6 @@
     }
 
     function evaluateCondition(height, period, windSpeed, windDeg) {
-      // Offshore/cross-offshore in Ancón is typically E / ESE / SE (70° to 150°)
       const isOffshore = windDeg >= 65 && windDeg <= 155;
       if (period >= 14 && height >= 1.1 && (isOffshore || windSpeed <= 13)) {
         return {
@@ -256,14 +260,14 @@
           label: "Corrible / Maniobrable",
           dotColor: "bg-amber-400",
           badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-          comment: `"Olas consistentes con algo de brisa. Buen ritmo para agarrar secciones rápidas y practicar maniobras en el labio."`
+          comment: `"Olas consistentes con algo de brisa. Buen ritmo para agarrar secciones rápidas y maniobras en el labio."`
         };
       } else {
         return {
           label: "Movido / Viento Activo",
           dotColor: "bg-rose-400",
           badgeClass: "bg-rose-500/15 text-rose-400 border-rose-500/25",
-          comment: `"Mar algo desordenado o con viento cruzado/onshore. Busca las series más ordenadas o espera el cambio de marea."`
+          comment: `"Mar algo desordenado o con viento cruzado. Busca las series más ordenadas o espera el cambio de marea."`
         };
       }
     }
@@ -303,7 +307,7 @@
       document.getElementById('cardComment').textContent = cond.comment;
 
       const badge = document.getElementById('cardConditionBadge');
-      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${cond.badgeClass}`;
+      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold border ${cond.badgeClass}`;
       badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`;
     }
 
@@ -341,12 +345,12 @@
           const windCardinal = getCardinalDirection(h.windDir);
 
           return `
-            <div class="grid grid-cols-12 items-center py-2.5 px-3 border-b border-slate-800/60 last:border-none text-xs hover:bg-slate-800/30 transition">
+            <div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 last:border-none text-xs lg:text-sm hover:bg-slate-800/30 transition">
               <div class="col-span-2 font-mono font-semibold text-slate-300">${hourLabel}</div>
-              <div class="col-span-4 pr-2">
+              <div class="col-span-4 pr-3">
                 <div class="flex items-center justify-between mb-1">
                   <span class="font-display font-bold text-white">${h.height.toFixed(1)}m</span>
-                  <span class="text-[10px] text-sky-400 font-semibold">${h.period}s</span>
+                  <span class="text-[10px] lg:text-xs text-sky-400 font-semibold">${h.period}s</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                   <div class="h-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full" style="width: ${barPct}%"></div>
@@ -354,7 +358,7 @@
               </div>
               <div class="col-span-4 text-center text-slate-300">
                 <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
-                <span class="text-[10px] text-slate-500 ml-0.5">${windCardinal}</span>
+                <span class="text-[10px] lg:text-xs text-slate-500 ml-1">${windCardinal}</span>
               </div>
               <div class="col-span-2 flex justify-end">
                 <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-900 border border-slate-800" title="${cond.label}">
@@ -369,11 +373,11 @@
           <div class="rounded-2xl bg-[#101724] border border-slate-800/90 overflow-hidden shadow-md">
             <button onclick="toggleAccordion(${idx})" class="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/30 transition">
               <div>
-                <div class="font-display font-bold text-sm text-white">${formatDayHeader(day.date, idx)}</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
+                <div class="font-display font-bold text-sm lg:text-base text-white">${formatDayHeader(day.date, idx)}</div>
+                <div class="text-[11px] lg:text-xs text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
               </div>
               <div class="flex items-center gap-2.5">
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
                   ${maxH}m
                 </span>
                 <svg id="acc-icon-${idx}" class="chevron-icon w-4 h-4 text-slate-400 ${isFirst ? 'rotated' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -382,7 +386,7 @@
               </div>
             </button>
             <div id="acc-content-${idx}" class="accordion-content ${isFirst ? 'open' : ''} border-t border-slate-800/80 bg-[#0b101b]">
-              <div class="grid grid-cols-12 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
+              <div class="grid grid-cols-12 px-4 py-2.5 text-[10px] lg:text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
                 <div class="col-span-2">Hora</div>
                 <div class="col-span-4">Ola / Período</div>
                 <div class="col-span-4 text-center">Viento</div>
@@ -416,46 +420,4 @@
           const [datePart, timePart] = isoTime.split('T');
           const hourNum = parseInt(timePart.split(':')[0], 10);
 
-          // Filter strictly from 06:00 AM (6) to 11:00 PM (23)
-          if (hourNum >= 6 && hourNum <= 23) {
-            if (!grouped[datePart]) grouped[datePart] = [];
-            const rawHeight = marineData.hourly.wave_height[i] || 1.2;
-            grouped[datePart].push({
-              hourNum,
-              height: rawHeight * spot.factor,
-              period: Math.round(marineData.hourly.wave_period[i] || 14),
-              swellDir: marineData.hourly.wave_direction[i] || 210,
-              windSpeed: weatherData.hourly.wind_speed_10m[i] || 10,
-              windDir: weatherData.hourly.wind_direction_10m[i] || 130
-            });
-          }
-        });
-
-        forecastDays = Object.keys(grouped).slice(0, 3).map(date => ({
-          date,
-          hours: grouped[date]
-        }));
-
-        if (forecastDays.length > 0) {
-          document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • ${formatDayHeader(forecastDays[0].date, 0)}`;
-        }
-
-        updateShiftCard();
-        renderAccordions();
-      } catch (err) {
-        console.error("Error obteniendo datos:", err);
-        document.getElementById('accordionsContainer').innerHTML = `
-          <div class="p-4 rounded-2xl bg-rose-950/30 border border-rose-800/50 text-xs text-rose-300 text-center">
-            No se pudo conectar con Open-Meteo. Revisa tu conexión e intenta actualizar nuevamente.
-          </div>
-        `;
-      } finally {
-        setTimeout(() => icon.classList.remove('animate-spin'), 400);
-      }
-    }
-
-    // Initialize on load
-    fetchSurfData();
-  </script>
-</body>
-</html>
+          if (hourNum >= 6 && hourNum <=
