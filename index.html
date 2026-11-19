@@ -153,7 +153,7 @@
                 Sincronizando...
               </span>
               <span id="cardBreakBadge" class="px-2.5 py-1 rounded-md text-[10px] lg:text-xs font-crew font-bold uppercase tracking-wider bg-sky-500/10 text-sky-300 border border-sky-500/20">
-                DERECHA
+                DERECHA • POINT
               </span>
             </div>
 
@@ -166,9 +166,168 @@
               </div>
               <div class="relative z-10 flex items-center gap-1.5 text-[10px] font-semibold text-slate-300 bg-slate-950/70 px-2 py-1 rounded-lg backdrop-blur-sm">
                 <span>Power:</span>
-                <span id="cardPowerLevel" class="text-emerald-400 font-bold">--</span>
+                <span id="cardPowerLevel" class="text-emerald-400 font-bold">Media / Técnica</span>
               </div>
             </div>
 
             <!-- Big Metrics -->
-            <div class="grid grid-cols-3 divide-x divide-slate-800/8
+            <div class="grid grid-cols-3 divide-x divide-slate-800/80 text-center my-4">
+              <div class="px-2">
+                <div id="cardWaveHeight" class="font-display text-3xl lg:text-4xl font-bold text-white tracking-tight">--m</div>
+                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Olas</div>
+              </div>
+              <div class="px-2">
+                <div id="cardWavePeriod" class="font-display text-3xl lg:text-4xl font-bold text-sky-400 tracking-tight">--s</div>
+                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Período</div>
+              </div>
+              <div class="px-2">
+                <div id="cardWindSpeed" class="font-display text-3xl lg:text-4xl font-bold text-slate-100 tracking-tight">--</div>
+                <div id="cardWindLabel" class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Viento km/h</div>
+              </div>
+            </div>
+
+            <!-- Comentario Local / Jerga Conera -->
+            <div class="mt-4 pt-3.5 border-t border-slate-800/80">
+              <p id="cardComment" class="text-xs lg:text-sm leading-relaxed text-slate-200 italic">
+                "Chequeando el mar desde el muelle..."
+              </p>
+            </div>
+          </div>
+
+          <!-- Pagination Dots -->
+          <div class="flex items-center justify-center gap-2 mt-3">
+            <button onclick="setShift(0)" id="dot-0" class="shift-dot h-1.5 w-5 rounded-full bg-sky-400 transition-all"></button>
+            <button onclick="setShift(1)" id="dot-1" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
+            <button onclick="setShift(2)" id="dot-2" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
+            <button onclick="setShift(3)" id="dot-3" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Panel: Hourly Accordions -->
+      <div>
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-xs lg:text-sm font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario Real (06:00 – 23:00)</h2>
+            <span class="text-[11px] lg:text-xs text-slate-500">Toca para desplegar</span>
+          </div>
+
+          <div id="accordionsContainer" class="space-y-3">
+            <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
+              Descargando datos en tiempo real de Open-Meteo...
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- Footer con Firma de Ancón -->
+    <footer class="mt-12 text-center space-y-1">
+      <div class="font-crew text-xs font-bold tracking-widest text-slate-400 uppercase">
+        Hecho en Ancón • Barrio & Bodyboard • Lima Norte
+      </div>
+      <div class="text-[11px] text-slate-600">
+        Datos 100% en tiempo real vía Open-Meteo Marine & Weather API
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Toast de confirmación para WhatsApp -->
+  <div id="toastMsg" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    ¡Parte copiado listo pa' pegar en el grupo!
+  </div>
+
+  <script>
+    const SPOTS = {
+      conchitas: {
+        name: "Las Conchitas",
+        subtitle: "Point Break • Buenas Derechas • Ancón",
+        breakTag: "DERECHA • POINT",
+        powerText: "Media / Técnica",
+        lat: -11.77,
+        lon: -77.21,
+        factor: 1.0
+      },
+      rocas: {
+        name: "Las Rocas",
+        subtitle: "Reef / Orillero • Buenas Izquierdas • Ancón",
+        breakTag: "IZQUIERDA • REEF",
+        powerText: "Alta / Rápida",
+        lat: -11.78,
+        lon: -77.22,
+        factor: 1.15
+      },
+      sanjuan: {
+        name: "Playa San Juan",
+        subtitle: "San Juan, Pasamayo • Bombas Izq. y Der.",
+        breakTag: "IZQ & DER • BOMBAS",
+        powerText: "Brava / Pesada",
+        lat: -11.62,
+        lon: -77.27,
+        factor: 1.35
+      }
+    };
+
+    const SHIFTS = [
+      { label: "SESIÓN MADRUGADA • 06:00 - 09:00", hours: [6, 7, 8, 9] },
+      { label: "MEDIA MAÑANA • 10:00 - 13:00", hours: [10, 11, 12, 13] },
+      { label: "SESIÓN SUNSET • 15:00 - 18:00", hours: [15, 16, 17, 18] },
+      { label: "NOCTURNO / MAREA • 19:00 - 23:00", hours: [19, 20, 21, 22, 23] }
+    ];
+
+    let currentSpotKey = "conchitas";
+    let currentShiftIndex = 0;
+    let forecastDays = [];
+    let animWaveHeight = 1.2;
+    let animWavePeriod = 14;
+    let animWindSpeed = 10;
+
+    function safeNum(val, fallback = 0) {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function initWaveCanvas() {
+      const canvas = document.getElementById('waveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let phase = 0;
+
+      function resize() {
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, canvas.offsetWidth * ratio);
+        canvas.height = Math.max(1, canvas.offsetHeight * ratio);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const amp = Math.min(h * 0.34, Math.max(8, animWaveHeight * 12));
+        const freq = 0.008 + (20 - Math.min(18, animWavePeriod)) * 0.0006;
+        const speed = 0.03 + (animWindSpeed * 0.002);
+
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        for (let x = 0; x <= w; x += 4) {
+          const y = h * 0.58 + Math.sin(x * freq * 0.8 + phase * 0.7 + 1.5) * (amp * 0.7);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h);
+        ctx.fillStyle = 'rgba(14, 165, 233, 0.12)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        for (let x = 0; x <= w; x += 4) {
+          const y = h * 0.62 + Math.sin(x * freq + phase) * amp;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h);
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, 'rgba(5
