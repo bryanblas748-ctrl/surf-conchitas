@@ -228,7 +228,7 @@
         Hecho en Ancón • Barrio & Bodyboard • Lima Norte
       </div>
       <div class="text-[11px] text-slate-600">
-        Datos 100% en tiempo real vía Open-Meteo Marine & Weather API
+        Datos en tiempo real vía Open-Meteo Marine & Weather API
       </div>
     </footer>
 
@@ -248,7 +248,9 @@
         powerText: "Media / Técnica",
         lat: -11.77,
         lon: -77.21,
-        factor: 1.0
+        factor: 1.0,
+        baseHeight: 1.1,
+        basePeriod: 14
       },
       rocas: {
         name: "Las Rocas",
@@ -257,7 +259,9 @@
         powerText: "Alta / Rápida",
         lat: -11.78,
         lon: -77.22,
-        factor: 1.15
+        factor: 1.15,
+        baseHeight: 1.2,
+        basePeriod: 14
       },
       sanjuan: {
         name: "Playa San Juan",
@@ -266,7 +270,9 @@
         powerText: "Brava / Pesada",
         lat: -11.62,
         lon: -77.27,
-        factor: 1.35
+        factor: 1.35,
+        baseHeight: 1.5,
+        basePeriod: 15
       }
     };
 
@@ -287,6 +293,42 @@
     function safeNum(val, fallback = 0) {
       const n = Number(val);
       return Number.isFinite(n) ? n : fallback;
+    }
+
+    function buildFallbackForecast(spotKey) {
+      const spot = SPOTS[spotKey] || SPOTS.conchitas;
+      const now = new Date();
+      const days = [];
+
+      for (let d = 0; d < 3; d++) {
+        const dt = new Date(now);
+        dt.setDate(now.getDate() + d);
+        const yyyy = dt.getFullYear();
+        const mm = String(dt.getMonth() + 1).padStart(2, '0');
+        const dd = String(dt.getDate()).padStart(2, '0');
+        const dateStr = `${yyyy}-${mm}-${dd}`;
+
+        const hours = [];
+        for (let h = 6; h <= 23; h++) {
+          const waveSwing = Math.sin((h - 6) * 0.35 + d) * 0.25;
+          const height = Math.max(0.6, Number((spot.baseHeight + waveSwing).toFixed(1)));
+          const period = Math.max(10, Math.round(spot.basePeriod + Math.cos(h * 0.3 + d)));
+          const windSpeed = h >= 11 && h <= 17 ? 15 + ((h + d) % 5) : 8 + ((h + d) % 4);
+          const windDir = h >= 11 && h <= 17 ? 215 : 135;
+          const swellDir = 220 + ((h + d * 3) % 25);
+
+          hours.push({
+            hourNum: h,
+            height,
+            period,
+            swellDir,
+            windSpeed,
+            windDir
+          });
+        }
+        days.push({ date: dateStr, hours });
+      }
+      return days;
     }
 
     function initWaveCanvas() {
@@ -525,4 +567,190 @@
 
     function formatDayHeader(dateStr, index) {
       const dateObj = new Date(dateStr + 'T12:00:00');
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', '
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const dayName = days[dateObj.getDay()];
+      const dayNum = dateObj.getDate();
+      const monthName = months[dateObj.getMonth()];
+      const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : '';
+      return `${dayName} ${dayNum} ${monthName}${tag}`;
+    }
+
+    function renderAccordions() {
+      const container = document.getElementById('accordionsContainer');
+      container.innerHTML = '';
+
+      forecastDays.forEach((day, idx) => {
+        const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1);
+        const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length);
+        const isFirst = idx === 0;
+
+        const rowsHtml = day.hours.map(h => {
+          const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir, currentSpotKey);
+          const barPct = Math.min(100, Math.round((h.height / 2.6) * 100));
+          const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
+          const windCardinal = getCardinalDirection(h.windDir);
+
+          return `
+            <div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 last:border-none text-xs lg:text-sm hover:bg-slate-800/30 transition">
+              <div class="col-span-2 font-mono font-semibold text-slate-300">${hourLabel}</div>
+              <div class="col-span-4 pr-3">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-display font-bold text-white">${h.height.toFixed(1)}m</span>
+                  <span class="text-[10px] lg:text-xs text-sky-400 font-semibold">${h.period}s</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full" style="width: ${barPct}%"></div>
+                </div>
+              </div>
+              <div class="col-span-4 text-center text-slate-300">
+                <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
+                <span class="text-[10px] lg:text-xs text-slate-500 ml-1">${windCardinal}</span>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-900 border border-slate-800" title="${cond.label}">
+                  <span class="w-2 h-2 rounded-full ${cond.dotColor}"></span>
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const cardHtml = `
+          <div class="rounded-2xl bg-[#101724] border border-slate-800/90 overflow-hidden shadow-md">
+            <button onclick="toggleAccordion(${idx})" class="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/30 transition">
+              <div>
+                <div class="font-display font-bold text-sm lg:text-base text-white">${formatDayHeader(day.date, idx)}</div>
+                <div class="text-[11px] lg:text-xs text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                  ${maxH}m
+                </span>
+                <svg id="acc-icon-${idx}" class="chevron-icon w-4 h-4 text-slate-400 ${isFirst ? 'rotated' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </button>
+            <div id="acc-content-${idx}" class="accordion-content ${isFirst ? 'open' : ''} border-t border-slate-800/80 bg-[#0b101b]">
+              <div class="grid grid-cols-12 px-4 py-2.5 text-[10px] lg:text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
+                <div class="col-span-2">Hora</div>
+                <div class="col-span-4">Ola / Período</div>
+                <div class="col-span-4 text-center">Viento</div>
+                <div class="col-span-2 text-right">Estado</div>
+              </div>
+              ${rowsHtml}
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    async function fetchSurfData() {
+      const icon = document.getElementById('refreshIcon');
+      const liveIndicator = document.getElementById('liveIndicator');
+      if (icon) icon.classList.add('animate-spin');
+
+      liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-400";
+      liveIndicator.innerHTML = `
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+        </span>
+        CONECTANDO...
+      `;
+
+      const spot = SPOTS[currentSpotKey];
+      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wave_height,wave_period,wave_direction&timezone=America%2FLima&forecast_days=3`;
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wind_speed_10m,wind_direction_10m&timezone=America%2FLima&forecast_days=3`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      try {
+        const [marineRes, weatherRes] = await Promise.all([
+          fetch(marineUrl, { signal: controller.signal }),
+          fetch(weatherUrl, { signal: controller.signal })
+        ]);
+        clearTimeout(timeoutId);
+
+        if (!marineRes.ok || !weatherRes.ok) {
+          throw new Error(`HTTP ${marineRes.status} / ${weatherRes.status}`);
+        }
+
+        const marineData = await marineRes.json();
+        const weatherData = await weatherRes.json();
+
+        if (!marineData?.hourly?.time || !marineData?.hourly?.wave_height) {
+          throw new Error("Sin datos horarios");
+        }
+
+        const times = marineData.hourly.time;
+        const grouped = {};
+
+        times.forEach((isoTime, i) => {
+          const [datePart, timePart] = String(isoTime).split('T');
+          if (!datePart || !timePart) return;
+          const hourNum = parseInt(timePart.split(':')[0], 10);
+
+          if (hourNum >= 6 && hourNum <= 23) {
+            if (!grouped[datePart]) grouped[datePart] = [];
+            const rawH = marineData.hourly.wave_height[i];
+            if (rawH !== null && rawH !== undefined && !Number.isNaN(Number(rawH))) {
+              grouped[datePart].push({
+                hourNum,
+                height: Number(rawH) * spot.factor,
+                period: Math.round(safeNum(marineData.hourly.wave_period?.[i], 12)),
+                swellDir: safeNum(marineData.hourly.wave_direction?.[i], 225),
+                windSpeed: safeNum(weatherData?.hourly?.wind_speed_10m?.[i], 8),
+                windDir: safeNum(weatherData?.hourly?.wind_direction_10m?.[i], 180)
+              });
+            }
+          }
+        });
+
+        const parsedDays = Object.keys(grouped).slice(0, 3).map(date => ({
+          date,
+          hours: grouped[date]
+        }));
+
+        if (parsedDays.length > 0 && parsedDays[0].hours.length > 0) {
+          forecastDays = parsedDays;
+          liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-400";
+          liveIndicator.innerHTML = `
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            EN VIVO
+          `;
+          document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • ${formatDayHeader(forecastDays[0].date, 0)}`;
+        } else {
+          throw new Error("Sin horas válidas");
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+        forecastDays = buildFallbackForecast(currentSpotKey);
+        liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-400";
+        liveIndicator.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          ESTIMADO
+        `;
+        document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • Referencia local`;
+      } finally {
+        document.getElementById('cardBreakBadge').textContent = spot.breakTag;
+        document.getElementById('cardPowerLevel').textContent = spot.powerText;
+        updateShiftCard();
+        renderAccordions();
+        if (icon) icon.classList.remove('animate-spin');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initWaveCanvas();
+      fetchSurfData();
+    });
+  </script>
+</body>
+</html>
