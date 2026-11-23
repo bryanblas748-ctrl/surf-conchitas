@@ -61,7 +61,7 @@ body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),tr
       <div class="px-2"><div id="mW" class="fd text-3xl font-bold">--</div><div id="mWl" class="text-[11px] text-slate-400 mt-1">Viento km/h</div></div>
     </div>
     <div class="grid grid-cols-3 gap-2 mt-4 text-center text-[11px]">
-      <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Dirección</div><div id="mD" class="font-semibold text-slate-200">--</div></div>
+      <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Swell actual</div><div id="mD" class="font-semibold text-slate-200">--</div></div>
       <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Marea</div><div id="mT" class="font-semibold text-slate-200">--</div></div>
       <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Agua</div><div id="mS" class="font-semibold text-slate-200">--</div></div>
     </div>
@@ -120,8 +120,8 @@ const MANUAL = {
    swell: ventana de dirección útil en grados. [0,360] = acepta cualquier dirección (norte, noroeste, sur, suroeste). Cuando sepas qué dirección funciona en cada spot, acota aquí, por ejemplo [270,360] para noroeste-norte. off: rango de viento terral (offshore).
    minP: período mínimo para que funcione. minH: altura mínima en m. maxWind: viento máximo tolerable. */
 const SPOTS = {
-  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],ideal:[247,370],off:[30,120],minP:12,minH:0.8,maxWind:18,
-    tip:"Prefiere swell sur y marea media."},
+  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],ideal:[[202,370]],off:[30,120],minP:12,minH:0.8,maxWind:18,
+    tip:"Le pega mejor swell noroeste, oeste y suroeste."},
   rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[0,360],off:[30,120],minP:13,minH:1.0,maxWind:18,
     tip:"Fondo de roca, ojo con la marea baja."},
   sanjuan:{name:"Playa San Juan",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[0,360],off:[40,130],minP:13,minH:1.3,maxWind:20,
@@ -134,6 +134,8 @@ const SHIFTS = [
   {l:"SUNSET • 6 PM – 8 PM",h:[18,19,20]}
 ];
 const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+const FULL=['Norte','Nor-noreste','Noreste','Este-noreste','Este','Este-sureste','Sureste','Sur-sureste','Sur','Sur-suroeste','Suroeste','Oeste-suroeste','Oeste','Oeste-noroeste','Noroeste','Nor-noroeste'];
+const full=d=>FULL[Math.round((((d%360)+360)%360)/22.5)%16];
 const COLORS=[
   {dot:'bg-emerald-400',cls:'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',em:'🟢'},
   {dot:'bg-amber-400',cls:'bg-amber-500/15 text-amber-400 border-amber-500/25',em:'🟡'},
@@ -161,11 +163,12 @@ function evaluate(x,key){
   if(!inWindow||x.swH<s.minH*0.7||x.swP<s.minP-3)
     return{lvl:3,label:"Sin swell útil",c:"Hoy el swell no entra bien a este spot. Plan B: otro spot o a esperar."};
   // ideal: swell que mejor entra al spot (oeste a norte). Fuera de eso, solo es "Bueno" con período largo.
-  const ideal=!s.ideal||x.swD===null||inRange(x.swD,s.ideal)||inRange(x.swD+360,s.ideal);
-  if(x.swP>=s.minP+1&&x.swH>=s.minH&&clean&&(ideal||x.swP>=s.minP+3))
+  const ideal=!s.ideal||x.swD===null||s.ideal.some(r=>inRange(x.swD,r)||inRange(x.swD+360,r));
+  const tideOk=!s.tideMid||x.tn===undefined||x.tn===null||(x.tn>=0.25&&x.tn<=0.75);
+  if(x.swP>=s.minP+1&&x.swH>=s.minH&&clean&&tideOk&&(ideal||x.swP>=s.minP+3))
     return{lvl:0,label:"Bueno",c:`Entra swell ordenado con ${Math.round(x.swP)}s y viento favorable. A aprovechar.`};
   if(x.swP>=s.minP&&x.swH>=s.minH*0.8&&x.wind<=s.maxWind)
-    return{lvl:1,label:"Regular",c:"Hay olas surfeables, pero con algo de brisa o menos fuerza. Revisa el mar al llegar."};
+    return{lvl:1,label:"Regular",c:tideOk?"Hay olas surfeables, pero con algo de brisa o menos fuerza. Revisa el mar al llegar.":"Hay olas, pero la marea no es la ideal (funciona mejor con marea media)."};
   return{lvl:2,label:"Malo",c:"Viento o período en contra, mar desordenado. Mejor esperar otra ventana."};
 }
 
@@ -201,6 +204,12 @@ async function load(){
     });
     const out=Object.keys(g).slice(0,3).map(date=>({date,hours:g[date]}));
     if(!out.length) throw new Error("vacío");
+    out.forEach(d=>{
+      const t=d.hours.map(x=>x.tide).filter(v=>v!==null);
+      if(t.length<4) return;
+      const lo=Math.min(...t), hi=Math.max(...t);
+      d.hours.forEach(x=>{x.tn=(x.tide!==null&&hi-lo>0.15)?(x.tide-lo)/(hi-lo):null});
+    });
     days=out; calInfo=cal; updatedAt=new Date();
     const hhmm=updatedAt.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',timeZone:'America/Lima'});
     setStatus(`Pronóstico • act. ${hhmm}`,"text-emerald-400");
@@ -279,11 +288,11 @@ function card_(){
   const hs=days[0].hours.filter(x=>SHIFTS[shiftIdx].h.includes(x.h));
   if(!hs.length){$('cond').textContent='Turno ya pasó';$('comment').textContent='Mira el siguiente turno o mañana.';return}
   const mid=hs[Math.floor(hs.length/2)];
-  const a={swH:avg(hs,x=>x.swH),swP:avg(hs,x=>x.swP),wind:avg(hs,x=>x.wind),wd:mid.wd,swD:mid.swD};
+  const a={swH:avg(hs,x=>x.swH),swP:avg(hs,x=>x.swP),wind:avg(hs,x=>x.wind),wd:mid.wd,swD:mid.swD,tn:(()=>{const v=hs.map(x=>x.tn).filter(t=>t!==null&&t!==undefined);return v.length?avg(v,t=>t):null})()};
   const ev=evaluate(a,spotKey), co=COLORS[ev.lvl];
   $('mH').textContent=a.swH.toFixed(1); $('mP').textContent=Math.round(a.swP)+'s';
   $('mW').textContent=Math.round(a.wind); $('mWl').textContent=`Viento ${card(a.wd)} km/h`;
-  $('mD').textContent=a.swD===null?'--':`${Math.round(a.swD)}° ${card(a.swD)}`;
+  $('mD').innerHTML=a.swD===null?'--':`${full(a.swD)} <span class="text-slate-500 font-normal">${Math.round(a.swD)}°</span>`;
   const t0=hs[0].tide,t1=hs[hs.length-1].tide;
   $('mT').textContent=t0===null?'--':`${avg(hs.filter(x=>x.tide!==null),x=>x.tide).toFixed(1)}m ${t1>t0?'↑':t1<t0?'↓':''}`;
   const sst=mid.sst; $('mS').textContent=sst===null?'--':`${sst.toFixed(0)}°C`;
@@ -335,7 +344,7 @@ function renderAcc(){
       const ev=evaluate(x,spotKey), co=COLORS[ev.lvl];
       return `<div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 text-xs lg:text-sm">
         <div class="col-span-2 font-mono font-semibold text-slate-300">${fmtHour(x.h)}</div>
-        <div class="col-span-3"><span class="fd font-bold">${x.swH.toFixed(1)}m</span> <span class="text-sky-400 text-[11px]">${Math.round(x.swP)}s</span></div>
+        <div class="col-span-3"><span class="fd font-bold">${x.swH.toFixed(1)}m</span> <span class="text-sky-400 text-[11px]">${Math.round(x.swP)}s${x.swD!==null?' • '+card(x.swD):''}</span></div>
         <div class="col-span-3 text-slate-300">${Math.round(x.wind)} km/h <span class="text-slate-500 text-[11px]">${card(x.wd)}</span></div>
         <div class="col-span-4 flex justify-end items-center gap-1.5"><span class="w-2 h-2 rounded-full ${co.dot}"></span><span class="text-[11px] text-slate-300">${ev.label}</span></div>
       </div>`}).join('');
