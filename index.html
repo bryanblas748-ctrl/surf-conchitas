@@ -120,7 +120,7 @@ const MANUAL = {
    swell: ventana de dirección útil en grados. [0,360] = acepta cualquier dirección (norte, noroeste, sur, suroeste). Cuando sepas qué dirección funciona en cada spot, acota aquí, por ejemplo [270,360] para noroeste-norte. off: rango de viento terral (offshore).
    minP: período mínimo para que funcione. minH: altura mínima en m. maxWind: viento máximo tolerable. */
 const SPOTS = {
-  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],off:[30,120],minP:12,minH:0.8,maxWind:18,
+  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],ideal:[247,370],off:[30,120],minP:12,minH:0.8,maxWind:18,
     tip:"Prefiere swell sur y marea media."},
   rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[0,360],off:[30,120],minP:13,minH:1.0,maxWind:18,
     tip:"Fondo de roca, ojo con la marea baja."},
@@ -160,7 +160,9 @@ function evaluate(x,key){
   const clean=offshore||x.wind<=12;
   if(!inWindow||x.swH<s.minH*0.7||x.swP<s.minP-3)
     return{lvl:3,label:"Sin swell útil",c:"Hoy el swell no entra bien a este spot. Plan B: otro spot o a esperar."};
-  if(x.swP>=s.minP+1&&x.swH>=s.minH&&clean)
+  // ideal: swell que mejor entra al spot (oeste a norte). Fuera de eso, solo es "Bueno" con período largo.
+  const ideal=!s.ideal||x.swD===null||inRange(x.swD,s.ideal)||inRange(x.swD+360,s.ideal);
+  if(x.swP>=s.minP+1&&x.swH>=s.minH&&clean&&(ideal||x.swP>=s.minP+3))
     return{lvl:0,label:"Bueno",c:`Entra swell ordenado con ${Math.round(x.swP)}s y viento favorable. A aprovechar.`};
   if(x.swP>=s.minP&&x.swH>=s.minH*0.8&&x.wind<=s.maxWind)
     return{lvl:1,label:"Regular",c:"Hay olas surfeables, pero con algo de brisa o menos fuerza. Revisa el mar al llegar."};
