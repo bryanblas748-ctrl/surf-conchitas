@@ -65,8 +65,11 @@ body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),tr
       <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Marea</div><div id="mT" class="font-semibold text-slate-200">--</div></div>
       <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Agua</div><div id="mS" class="font-semibold text-slate-200">--</div></div>
     </div>
+    <div id="windDay" class="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-3 text-xs text-slate-200"></div>
     <p id="comment" class="mt-4 pt-3.5 border-t border-slate-800 text-xs lg:text-sm text-slate-200 italic"></p>
     <div id="manual" class="hidden mt-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-200"></div>
+    <p id="calNote" class="mt-2 text-[10px] text-slate-500"></p>
+    <a id="formLink" target="_blank" rel="noopener" class="hidden mt-3 block text-center rounded-xl bg-sky-500 text-slate-950 font-bold text-xs py-2.5">📝 Reporta lo que ves en el agua</a>
   </div>
 
   <div class="flex justify-center gap-2 mt-3" id="dots"></div>
@@ -101,6 +104,11 @@ body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),tr
 /* ============ REPORTE MANUAL DE LA CREW ============
    Edita esto cuando vayas al agua. "at" = fecha y hora de Lima (ISO). Se muestra solo si tiene menos de 12 h.
    Ejemplo: conchitas: { at: "2026-11-23T07:30", by: "Tito", text: "1.2 m, limpio, marea baja, bien parejo" } */
+/* ============ REPORTES DE LA CREW (Google Forms + Sheets) ============
+   SHEET_CSV: link CSV publicado de tu hoja de respuestas. FORM_URL: link del formulario.
+   Columnas de la hoja, en este orden: Marca temporal | Spot | Altura (m) | Calidad | Comentario | Quién */
+const SHEET_CSV = "";
+const FORM_URL = "";
 const MANUAL = {
   conchitas: null,
   rocas: null,
@@ -109,14 +117,14 @@ const MANUAL = {
 
 /* ============ SPOTS ============
    factor: estimación referencial de la altura vs. el modelo (ajústalo con tus observaciones).
-   swell: ventana de dirección útil en grados. off: rango de viento terral (offshore).
+   swell: ventana de dirección útil en grados. [0,360] = acepta cualquier dirección (norte, noroeste, sur, suroeste). Cuando sepas qué dirección funciona en cada spot, acota aquí, por ejemplo [270,360] para noroeste-norte. off: rango de viento terral (offshore).
    minP: período mínimo para que funcione. minH: altura mínima en m. maxWind: viento máximo tolerable. */
 const SPOTS = {
-  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[170,240],off:[30,120],minP:12,minH:0.8,maxWind:18,
+  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],off:[30,120],minP:12,minH:0.8,maxWind:18,
     tip:"Prefiere swell sur y marea media."},
-  rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[180,250],off:[30,120],minP:13,minH:1.0,maxWind:18,
+  rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[0,360],off:[30,120],minP:13,minH:1.0,maxWind:18,
     tip:"Fondo de roca, ojo con la marea baja."},
-  sanjuan:{name:"Playa San Juan",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[180,260],off:[40,130],minP:13,minH:1.3,maxWind:20,
+  sanjuan:{name:"Playa San Juan",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[0,360],off:[40,130],minP:13,minH:1.3,maxWind:20,
     tip:"Corriente fuerte. Solo con experiencia y acompañado."}
 };
 const SHIFTS = [
@@ -133,6 +141,7 @@ const COLORS=[
   {dot:'bg-slate-400',cls:'bg-slate-500/15 text-slate-300 border-slate-500/25',em:'⚪'}
 ];
 
+let reports=[], calInfo={n:0,f:1,ok:false};
 let spotKey="conchitas", shiftIdx=0, days=[], reqId=0, updatedAt=null;
 
 const num=(v,f=null)=>{const n=Number(v);return v!==null&&v!==undefined&&Number.isFinite(n)?n:f};
@@ -163,23 +172,25 @@ async function load(){
   const my=++reqId, key=spotKey, s=SPOTS[key];
   $('spin').classList.add('animate-spin');
   setStatus("Cargando…","text-amber-400");
-  const q="&timezone=America%2FLima&forecast_days=3";
+  const q="&timezone=America%2FLima&past_days=7&forecast_days=3";
   const mUrl=`https://marine-api.open-meteo.com/v1/marine?latitude=${s.lat}&longitude=${s.lon}&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wave_period,wave_direction,sea_level_height_msl,sea_surface_temperature${q}`;
   const wUrl=`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&hourly=wind_speed_10m,wind_direction_10m${q}`;
   const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),8000);
   try{
-    const [mr,wr]=await Promise.all([fetch(mUrl,{signal:ctl.signal}),fetch(wUrl,{signal:ctl.signal})]);
+    const [mr,wr,rp]=await Promise.all([fetch(mUrl,{signal:ctl.signal}),fetch(wUrl,{signal:ctl.signal}),getReports()]);
     if(!mr.ok||!wr.ok) throw new Error("HTTP");
     const m=(await mr.json()).hourly, w=(await wr.json()).hourly;
-    if(my!==reqId) return; // llegó tarde, ya cambiaste de spot
-    const g={};
+    if(my!==reqId) return;
+    reports=rp; const g={}, hist={}, today=limaDate();
+    const cal=calibrate(key,m,hist), fac=cal.f;
     m.time.forEach((iso,i)=>{
       const [d,tm]=iso.split('T'), h=parseInt(tm,10);
-      if(h<6||h>20) return;
       const swH=num(m.swell_wave_height[i],num(m.wave_height[i]));
       if(swH===null) return;
+      hist[d+' '+h]=swH;
+      if(d<today||h<6||h>20) return;
       (g[d]=g[d]||[]).push({
-        h, swH:swH*s.factor,
+        h, swH:swH*fac,
         swP:num(m.swell_wave_period[i],num(m.wave_period[i],0)),
         swD:num(m.swell_wave_direction[i],num(m.wave_direction[i])),
         tide:num(m.sea_level_height_msl[i]), sst:num(m.sea_surface_temperature[i]),
@@ -188,7 +199,7 @@ async function load(){
     });
     const out=Object.keys(g).slice(0,3).map(date=>({date,hours:g[date]}));
     if(!out.length) throw new Error("vacío");
-    days=out; updatedAt=new Date();
+    days=out; calInfo=cal; updatedAt=new Date();
     const hhmm=updatedAt.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',timeZone:'America/Lima'});
     setStatus(`Pronóstico • act. ${hhmm}`,"text-emerald-400");
     render();
@@ -203,6 +214,44 @@ async function load(){
     clearTimeout(t);
     if(my===reqId) $('spin').classList.remove('animate-spin');
   }
+}
+async function getReports(){
+  if(!SHEET_CSV) return [];
+  try{
+    const r=await fetch(SHEET_CSV); if(!r.ok) return [];
+    const p2=n=>String(n).padStart(2,'0');
+    return parseCSV(await r.text()).slice(1).map(c=>{
+      const m=(c[0]||'').match(/(\d+)\/(\d+)\/(\d{4})[ ,]+(\d+):(\d+)/); if(!m) return null;
+      const sp=(c[1]||'').toLowerCase();
+      const spot=sp.includes('conchita')?'conchitas':sp.includes('roca')?'rocas':sp.includes('juan')?'sanjuan':null;
+      if(!spot) return null;
+      const d=`${m[3]}-${p2(m[2])}-${p2(m[1])}`, hr=+m[4];
+      const h=parseFloat((c[2]||'').replace(',','.'));
+      return {spot,d,hr,t:new Date(`${d}T${p2(hr)}:${m[5]}:00-05:00`).getTime(),h:Number.isFinite(h)?h:null,q:c[3]||'',text:c[4]||'',by:c[5]||'crew'};
+    }).filter(Boolean);
+  }catch(e){return []}
+}
+function parseCSV(t){
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(f);f=''}
+    else if(c==='\n'){row.push(f);rows.push(row);row=[];f=''}
+    else if(c!=='\r')f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}
+  return rows;
+}
+/* Factor real = mediana de (altura que reportó la crew / altura cruda del modelo). Necesita 5+ reportes. */
+function calibrate(key,m,hist){
+  const s=SPOTS[key], r=[];
+  reports.filter(x=>x.spot===key&&x.h!==null).forEach(x=>{
+    const raw=hist[x.d+' '+x.hr];
+    if(raw>0.2) r.push(x.h/raw);
+  });
+  if(r.length<5) return {n:r.length,f:s.factor,ok:false};
+  r.sort((a,b)=>a-b);
+  return {n:r.length,f:Math.min(2.5,Math.max(0.5,r[Math.floor(r.length/2)])),ok:true};
 }
 function setStatus(t,c){const e=$('status');e.textContent=t;e.className=`text-[11px] font-semibold uppercase tracking-wider ${c}`}
 
@@ -237,11 +286,21 @@ function card_(){
   $('mT').textContent=t0===null?'--':`${avg(hs.filter(x=>x.tide!==null),x=>x.tide).toFixed(1)}m ${t1>t0?'↑':t1<t0?'↓':''}`;
   const sst=mid.sst; $('mS').textContent=sst===null?'--':`${sst.toFixed(0)}°C`;
   $('comment').textContent=ev.c;
+  const wd=windSummary(days[0]);
+  $('windDay').textContent=`💨 Hoy: ${wd.em} ${wd.label}. Viento máx ${wd.max} km/h a las ${fmtHour(wd.mh)}. ${wd.calm?'Mejor ventana sin viento: '+wd.calm+'.':'No hay horas calmas hoy.'}`;
+  $('calNote').textContent=calInfo.ok?`Altura calibrada con ${calInfo.n} reportes de la crew (factor ${calInfo.f.toFixed(2)})`:`Altura estimada, aún sin calibrar (${calInfo.n}/5 reportes con altura)`;
   $('cond').className=`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${co.cls}`;
   $('cond').innerHTML=`<span class="w-1.5 h-1.5 rounded-full ${co.dot}"></span>${ev.label}`;
 }
 function showManual(){
   const m=MANUAL[spotKey], el=$('manual');
+  const r=reports.filter(x=>x.spot===spotKey&&Date.now()-x.t<12*3600e3&&Date.now()-x.t>-3600e3).sort((a,b)=>b.t-a.t)[0];
+  if(r){
+    const min=Math.max(0,Math.round((Date.now()-r.t)/60000));
+    const ago=min<60?`hace ${min} min`:`hace ${Math.round(min/60)} h`;
+    el.textContent=`📍 Crew (${r.by}, ${ago}): ${r.h!==null?r.h+' m • ':''}${r.q}${r.text?' • '+r.text:''}`;
+    el.classList.remove('hidden'); return;
+  }
   if(m&&m.at&&(Date.now()-new Date(m.at+'-05:00').getTime())<12*3600e3){
     const hh=new Date(m.at+'-05:00').toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',timeZone:'America/Lima'});
     el.textContent=`📍 Reporte de la crew (${m.by||'crew'}, ${hh}): ${m.text}`; el.classList.remove('hidden');
@@ -252,10 +311,24 @@ function dayName(d,i){
   return `${n[dt.getDay()]} ${dt.getDate()} ${m[dt.getMonth()]}${i===0?' (Hoy)':i===1?' (Mañana)':''}`;
 }
 function toggle(i){$('c'+i).classList.toggle('open');$('i'+i).classList.toggle('rotate-180')}
+function windSummary(day){
+  const s=SPOTS[spotKey], ws=day.hours.map(x=>x.wind), max=Math.max(...ws);
+  const mh=day.hours[ws.indexOf(max)].h;
+  const lvl=max<=12?0:max<=s.maxWind?1:2;
+  let best=null,cur=null;
+  day.hours.forEach(x=>{
+    if(x.wind<=12){
+      if(cur&&x.h===cur.e+1) cur.e=x.h; else cur={b:x.h,e:x.h};
+      if(!best||cur.e-cur.b>best.e-best.b) best={b:cur.b,e:cur.e};
+    }else cur=null;
+  });
+  return {lvl,max:Math.round(max),mh,label:['Día calmo','Brisa moderada','Día ventoso'][lvl],em:['🟢','🟡','🔴'][lvl],
+    calm:best?(best.b===best.e?fmtHour(best.b):`${fmtHour(best.b)} – ${fmtHour(best.e)}`):null};
+}
 function renderAcc(){
   $('acc').innerHTML=days.map((day,i)=>{
     const max=Math.max(...day.hours.map(x=>x.swH)).toFixed(1);
-    const best=Math.min(...day.hours.map(x=>evaluate(x,spotKey).lvl));
+    const w=windSummary(day);
     const rows=day.hours.map(x=>{
       const ev=evaluate(x,spotKey), co=COLORS[ev.lvl];
       return `<div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 text-xs lg:text-sm">
@@ -268,7 +341,7 @@ function renderAcc(){
     return `<div class="rounded-2xl bg-[#101724] border border-slate-800 overflow-hidden">
       <button onclick="toggle(${i})" class="w-full flex items-center justify-between p-4 text-left">
         <div><div class="fd font-bold text-sm text-white">${dayName(day.date,i)}</div>
-        <div class="text-[11px] text-slate-400 mt-0.5">Máx ${max}m • mejor franja: ${COLORS[best].em}</div></div>
+        <div class="text-[11px] text-slate-400 mt-0.5">Máx ${max}m • ${w.em} ${w.label} (hasta ${w.max} km/h)${w.calm?' • Calmo: '+w.calm:''}</div></div>
         <svg id="i${i}" class="w-4 h-4 text-slate-400 transition-transform ${open?'rotate-180':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
       </button>
       <div id="c${i}" class="acc ${open?'open':''} border-t border-slate-800 bg-[#0b101b]">
@@ -291,7 +364,7 @@ function share(){
   const t=$('toast'); t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'),2500);
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
-document.addEventListener('DOMContentLoaded',()=>{renderNav();header();card_();load()});
+document.addEventListener('DOMContentLoaded',()=>{renderNav();header();card_();if(FORM_URL){$('formLink').href=FORM_URL;$('formLink').classList.remove('hidden')}load()});
 </script>
 </body>
 </html>
