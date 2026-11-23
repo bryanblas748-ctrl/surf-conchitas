@@ -274,7 +274,13 @@ function renderNav(){
 function selectSpot(k){spotKey=k;renderNav();header();days=[];load()}
 function header(){
   const s=SPOTS[spotKey];
-  $('spotTitle').textContent=s.name; $('spotSub').textContent=`${s.sub} • ${s.tip}`; $('tag').textContent=s.tag;
+  $('spotTitle').textContent=s.name; $('tag').textContent=s.tag;
+  let now='';
+  if(days[0]&&days[0].date===limaDate()){
+    const h=limaHour(), x=days[0].hours.reduce((b,c)=>Math.abs(c.h-h)<Math.abs(b.h-h)?c:b);
+    if(x.swD!==null) now=` • 🌊 Swell ahora: ${full(x.swD)} (${Math.round(x.swD)}°), ${Math.round(x.swP)}s`;
+  }
+  $('spotSub').textContent=s.sub+now;
 }
 function shift(d){setShift((shiftIdx+d+SHIFTS.length)%SHIFTS.length)}
 function setShift(i){shiftIdx=i;card_()}
@@ -366,7 +372,7 @@ function render(){
   const h=limaHour();
   const idx=SHIFTS.findIndex(s=>s.h.includes(h));
   if(days[0]&&days[0].date===limaDate()&&idx>=0&&!render.done){shiftIdx=idx;render.done=true}
-  card_(); renderAcc();
+  header(); card_(); renderAcc();
 }
 function share(){
   const s=SPOTS[spotKey];
