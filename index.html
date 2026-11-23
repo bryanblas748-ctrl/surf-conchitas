@@ -1,756 +1,296 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>ANCÓN SWELL CREW • Km 43 | Surf & Bodyboard Report</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-dark: #06090f;
-      --card-bg: #0f1623;
-      --card-border: #1e293b;
-      --accent-cyan: #38bdf8;
-      --accent-emerald: #10b981;
-    }
-    body {
-      background-color: var(--bg-dark);
-      background-image: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 55%);
-      color: #f8fafc;
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .font-display {
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .font-crew {
-      font-family: 'Chakra Petch', sans-serif;
-    }
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #06090f;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    .accordion-content {
-      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-    }
-    .accordion-content.open {
-      max-height: 2000px;
-      opacity: 1;
-    }
-    .chevron-icon {
-      transition: transform 0.3s ease;
-    }
-    .chevron-icon.rotated {
-      transform: rotate(180deg);
-    }
-
-    @media (min-width: 1024px) {
-      .app-container {
-        max-width: 1120px !important;
-        padding-top: 2.5rem;
-      }
-      .desktop-grid {
-        display: grid;
-        grid-template-columns: 400px 1fr;
-        gap: 2rem;
-        align-items: start;
-      }
-      .desktop-sticky-panel {
-        position: sticky;
-        top: 2rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ANCÓN SWELL CREW • Reporte de Olas Km 43</title>
+<meta name="description" content="Pronóstico de olas para Las Conchitas, Las Rocas y Playa San Juan (Pasamayo)." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Ancón Swell Crew • Reporte de Olas" />
+<meta property="og:description" content="Las Conchitas, Las Rocas y San Juan: olas, período, viento, marea y reporte de la crew." />
+<meta property="og:image" content="https://TU-DOMINIO.com/og.jpg" />
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),transparent 55%);color:#f8fafc;font-family:Inter,sans-serif}
+.fd{font-family:'Space Grotesk',sans-serif}.fc{font-family:'Chakra Petch',sans-serif}
+.acc{max-height:0;overflow:hidden;transition:max-height .35s ease}.acc.open{max-height:2400px}
+@media(min-width:1024px){.wrap{max-width:1120px!important}.grid2{display:grid;grid-template-columns:400px 1fr;gap:2rem;align-items:start}.sticky2{position:sticky;top:2rem}}
+</style>
 </head>
-<body class="min-h-screen pb-14 selection:bg-sky-500 selection:text-white">
+<body class="min-h-screen pb-14">
+<div class="wrap max-w-md mx-auto px-4 pt-6">
 
-  <div class="app-container max-w-md mx-auto px-4 pt-6">
-
-    <!-- Header con Identidad Conera / Km 43 -->
-    <header class="flex items-start justify-between mb-5">
-      <div>
-        <div class="flex flex-wrap items-center gap-2 mb-1.5">
-          <span class="px-2 py-0.5 rounded bg-sky-500/15 border border-sky-500/30 font-crew text-[10px] lg:text-xs font-bold tracking-wider text-sky-400 uppercase">
-            KM 43 • LIMA NORTE
-          </span>
-          <div id="liveIndicator" class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-400">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-            </span>
-            Conectando...
-          </div>
-        </div>
-        <h1 id="spotTitle" class="font-crew text-3xl lg:text-4xl font-bold tracking-tight text-white uppercase">Las Conchitas</h1>
-        <p id="spotSubtitle" class="text-xs lg:text-sm text-slate-400 mt-0.5 font-medium">Point Break • Buenas Derechas • Ancón</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="shareWhatsApp()" title="Mandar parte al grupo" class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 active:scale-95 transition">
-          <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
-          </svg>
-        </button>
-        <button onclick="fetchSurfData()" title="Actualizar reporte en vivo" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 active:scale-95 transition">
-          <svg id="refreshIcon" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
-      </div>
-    </header>
-
-    <!-- Spot Selector Pills -->
-    <nav class="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-slate-900/90 border border-slate-800/80 mb-6">
-      <button onclick="selectSpot('conchitas')" id="btn-conchitas" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold transition-all bg-sky-500 text-slate-950 shadow-sm">
-        Las Conchitas
-      </button>
-      <button onclick="selectSpot('rocas')" id="btn-rocas" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold text-slate-400 hover:text-white transition-all">
-        Las Rocas
-      </button>
-      <button onclick="selectSpot('sanjuan')" id="btn-sanjuan" class="spot-btn py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold text-slate-400 hover:text-white transition-all">
-        Playa San Juan
-      </button>
-    </nav>
-
-    <!-- Desktop Grid Layout -->
-    <div class="desktop-grid">
-
-      <!-- Left Panel: Main Card -->
-      <div class="desktop-sticky-panel mb-6 lg:mb-0">
-        <section>
-          <div class="flex items-center justify-between mb-2.5 px-1">
-            <button onclick="changeShift(-1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <span id="shiftBadge" class="text-[11px] lg:text-xs font-bold tracking-wider uppercase text-sky-400">
-              SESIÓN MADRUGADA • 06:00 - 09:00
-            </span>
-            <button onclick="changeShift(1)" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white active:scale-90 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            </button>
-          </div>
-
-          <div id="waveCard" class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0b101b] border border-slate-800/90 p-5 lg:p-6 shadow-2xl transition-all duration-300">
-
-            <!-- Badge de Condición y Tipo de Ola -->
-            <div class="flex items-center justify-between mb-3">
-              <span id="cardConditionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
-                Sincronizando...
-              </span>
-              <span id="cardBreakBadge" class="px-2.5 py-1 rounded-md text-[10px] lg:text-xs font-crew font-bold uppercase tracking-wider bg-sky-500/10 text-sky-300 border border-sky-500/20">
-                DERECHA • POINT
-              </span>
-            </div>
-
-            <!-- Visualizador Animado de Ola en Vivo -->
-            <div class="relative w-full h-16 my-2 rounded-2xl bg-[#070b12]/80 border border-slate-800/60 overflow-hidden flex items-center justify-between px-3">
-              <canvas id="waveCanvas" class="absolute inset-0 w-full h-full"></canvas>
-              <div class="relative z-10 flex items-center gap-1.5 text-[10px] font-semibold text-slate-300 bg-slate-950/70 px-2 py-1 rounded-lg backdrop-blur-sm">
-                <span>Swell:</span>
-                <span id="cardSwellDir" class="text-sky-400 font-bold">--</span>
-              </div>
-              <div class="relative z-10 flex items-center gap-1.5 text-[10px] font-semibold text-slate-300 bg-slate-950/70 px-2 py-1 rounded-lg backdrop-blur-sm">
-                <span>Power:</span>
-                <span id="cardPowerLevel" class="text-emerald-400 font-bold">Media / Técnica</span>
-              </div>
-            </div>
-
-            <!-- Big Metrics -->
-            <div class="grid grid-cols-3 divide-x divide-slate-800/80 text-center my-4">
-              <div class="px-2">
-                <div id="cardWaveHeight" class="font-display text-3xl lg:text-4xl font-bold text-white tracking-tight">--m</div>
-                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Olas</div>
-              </div>
-              <div class="px-2">
-                <div id="cardWavePeriod" class="font-display text-3xl lg:text-4xl font-bold text-sky-400 tracking-tight">--s</div>
-                <div class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Período</div>
-              </div>
-              <div class="px-2">
-                <div id="cardWindSpeed" class="font-display text-3xl lg:text-4xl font-bold text-slate-100 tracking-tight">--</div>
-                <div id="cardWindLabel" class="text-[11px] lg:text-xs font-medium text-slate-400 mt-1">Viento km/h</div>
-              </div>
-            </div>
-
-            <!-- Comentario Local / Jerga Conera -->
-            <div class="mt-4 pt-3.5 border-t border-slate-800/80">
-              <p id="cardComment" class="text-xs lg:text-sm leading-relaxed text-slate-200 italic">
-                "Chequeando el mar desde el muelle..."
-              </p>
-            </div>
-          </div>
-
-          <!-- Pagination Dots -->
-          <div class="flex items-center justify-center gap-2 mt-3">
-            <button onclick="setShift(0)" id="dot-0" class="shift-dot h-1.5 w-5 rounded-full bg-sky-400 transition-all"></button>
-            <button onclick="setShift(1)" id="dot-1" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-            <button onclick="setShift(2)" id="dot-2" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-            <button onclick="setShift(3)" id="dot-3" class="shift-dot h-1.5 w-1.5 rounded-full bg-slate-700 transition-all"></button>
-          </div>
-        </section>
-      </div>
-
-      <!-- Right Panel: Hourly Accordions -->
-      <div>
-        <section>
-          <div class="flex items-center justify-between mb-3 px-1">
-            <h2 class="text-xs lg:text-sm font-bold uppercase tracking-wider text-slate-400">Pronóstico Horario Real (06:00 – 23:00)</h2>
-            <span class="text-[11px] lg:text-xs text-slate-500">Toca para desplegar</span>
-          </div>
-
-          <div id="accordionsContainer" class="space-y-3">
-            <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
-              Descargando datos en tiempo real de Open-Meteo...
-            </div>
-          </div>
-        </section>
-      </div>
-
+<header class="flex items-start justify-between mb-5">
+  <div>
+    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+      <span class="px-2 py-0.5 rounded bg-sky-500/15 border border-sky-500/30 fc text-[10px] font-bold tracking-wider text-sky-400">KM 43 • LIMA NORTE</span>
+      <span id="status" class="text-[11px] font-semibold uppercase tracking-wider text-amber-400">Cargando…</span>
     </div>
+    <h1 id="spotTitle" class="fc text-3xl lg:text-4xl font-bold uppercase">Las Conchitas</h1>
+    <p id="spotSub" class="text-xs lg:text-sm text-slate-400 mt-0.5"></p>
+  </div>
+  <div class="flex gap-2">
+    <button onclick="share()" aria-label="Compartir por WhatsApp" class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 active:scale-95">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4a8 8 0 00-6.9 12L4 20l4.1-1.1A8 8 0 1012 4zm4.3 11.2c-.2.5-1 .9-1.4 1-.4 0-.8.1-1.4-.1-.3-.1-.7-.2-1.2-.4-2.100-.9-3.500-3-3.600-3.100-.1-.1-.9-1.200-.9-2.200s.5-1.500.7-1.700c.2-.2.4-.3.600-.3h.4c.1 0 .3 0 .5.4l.7 1.600c.1.100.1.300 0 .400l-.3.400-.3.300c-.1.100-.2.200-.1.400.1.200.6 1 1.300 1.600.9.800 1.600 1 1.800 1.100.2.100.3.100.4-.1l.7-.8c.1-.2.300-.2.500-.1l1.500.7c.2.100.3.200.4.300.1.100.1.600-.1 1.100z"/></svg>
+    </button>
+    <button onclick="load()" aria-label="Actualizar" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 active:scale-95">
+      <svg id="spin" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.6m15.4 2A8 8 0 004.600 9M4.600 9H9m11 11v-5h-.6m0 0a8 8 0 01-15.400-2m15.400 2H15"/></svg>
+    </button>
+  </div>
+</header>
 
-    <!-- Footer con Firma de Ancón -->
-    <footer class="mt-12 text-center space-y-1">
-      <div class="font-crew text-xs font-bold tracking-widest text-slate-400 uppercase">
-        Hecho en Ancón • Barrio & Bodyboard • Lima Norte
-      </div>
-      <div class="text-[11px] text-slate-600">
-        Datos en tiempo real vía Open-Meteo Marine & Weather API
-      </div>
-    </footer>
+<nav class="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-slate-900/90 border border-slate-800 mb-6" id="nav"></nav>
 
+<div class="grid2">
+<div class="sticky2 mb-6">
+  <div class="flex items-center justify-between mb-2.5 px-1">
+    <button onclick="shift(-1)" aria-label="Turno anterior" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">‹</button>
+    <span id="shiftLabel" class="text-[11px] font-bold tracking-wider uppercase text-sky-400"></span>
+    <button onclick="shift(1)" aria-label="Turno siguiente" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">›</button>
   </div>
 
-  <!-- Toast de confirmación para WhatsApp -->
-  <div id="toastMsg" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-    ¡Parte copiado listo pa' pegar en el grupo!
+  <div class="rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0b101b] border border-slate-800 p-5 shadow-2xl">
+    <div class="flex items-center justify-between mb-4">
+      <span id="cond" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border border-slate-700">—</span>
+      <span id="tag" class="px-2.5 py-1 rounded-md text-[10px] fc font-bold uppercase bg-sky-500/10 text-sky-300 border border-sky-500/20"></span>
+    </div>
+    <div class="grid grid-cols-3 divide-x divide-slate-800 text-center">
+      <div class="px-2"><div id="mH" class="fd text-3xl font-bold">--</div><div class="text-[11px] text-slate-400 mt-1">Swell (m)</div></div>
+      <div class="px-2"><div id="mP" class="fd text-3xl font-bold text-sky-400">--</div><div class="text-[11px] text-slate-400 mt-1">Período</div></div>
+      <div class="px-2"><div id="mW" class="fd text-3xl font-bold">--</div><div id="mWl" class="text-[11px] text-slate-400 mt-1">Viento km/h</div></div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 mt-4 text-center text-[11px]">
+      <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Dirección</div><div id="mD" class="font-semibold text-slate-200">--</div></div>
+      <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Marea</div><div id="mT" class="font-semibold text-slate-200">--</div></div>
+      <div class="rounded-xl bg-slate-900/80 border border-slate-800 py-2"><div class="text-slate-500">Agua</div><div id="mS" class="font-semibold text-slate-200">--</div></div>
+    </div>
+    <p id="comment" class="mt-4 pt-3.5 border-t border-slate-800 text-xs lg:text-sm text-slate-200 italic"></p>
+    <div id="manual" class="hidden mt-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 p-3 text-xs text-emerald-200"></div>
   </div>
 
-  <script>
-    const SPOTS = {
-      conchitas: {
-        name: "Las Conchitas",
-        subtitle: "Point Break • Buenas Derechas • Ancón",
-        breakTag: "DERECHA • POINT",
-        powerText: "Media / Técnica",
-        lat: -11.77,
-        lon: -77.21,
-        factor: 1.0,
-        baseHeight: 1.1,
-        basePeriod: 14
-      },
-      rocas: {
-        name: "Las Rocas",
-        subtitle: "Reef / Orillero • Buenas Izquierdas • Ancón",
-        breakTag: "IZQUIERDA • REEF",
-        powerText: "Alta / Rápida",
-        lat: -11.78,
-        lon: -77.22,
-        factor: 1.15,
-        baseHeight: 1.2,
-        basePeriod: 14
-      },
-      sanjuan: {
-        name: "Playa San Juan",
-        subtitle: "San Juan, Pasamayo • Bombas Izq. y Der.",
-        breakTag: "IZQ & DER • BOMBAS",
-        powerText: "Brava / Pesada",
-        lat: -11.62,
-        lon: -77.27,
-        factor: 1.35,
-        baseHeight: 1.5,
-        basePeriod: 15
-      }
-    };
+  <div class="flex justify-center gap-2 mt-3" id="dots"></div>
 
-    const SHIFTS = [
-      { label: "SESIÓN MADRUGADA • 06:00 - 09:00", hours: [6, 7, 8, 9] },
-      { label: "MEDIA MAÑANA • 10:00 - 13:00", hours: [10, 11, 12, 13] },
-      { label: "SESIÓN SUNSET • 15:00 - 18:00", hours: [15, 16, 17, 18] },
-      { label: "NOCTURNO / MAREA • 19:00 - 23:00", hours: [19, 20, 21, 22, 23] }
-    ];
+  <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400 justify-center">
+    <span>🟢 Bueno</span><span>🟡 Regular</span><span>🔴 Malo</span><span>⚪ Sin swell útil</span>
+  </div>
+</div>
 
-    let currentSpotKey = "conchitas";
-    let currentShiftIndex = 0;
-    let forecastDays = [];
-    let animWaveHeight = 1.2;
-    let animWavePeriod = 14;
-    let animWindSpeed = 10;
+<div>
+  <div class="flex items-center justify-between mb-3 px-1">
+    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pronóstico horario (06:00 – 20:00)</h2>
+    <span class="text-[11px] text-slate-500">Toca para desplegar</span>
+  </div>
+  <div id="acc" class="space-y-3"></div>
+</div>
+</div>
 
-    function safeNum(val, fallback = 0) {
-      const n = Number(val);
-      return Number.isFinite(n) ? n : fallback;
-    }
+<div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-100">
+  <b>Ojo:</b> es un pronóstico de modelo, no una medición. La altura de cada spot es una estimación referencial y la marea y las corrientes cambian todo. Mira el mar antes de entrar, sobre todo en San Juan (corrientes fuertes). Nadie surfea solo.
+</div>
 
-    function buildFallbackForecast(spotKey) {
-      const spot = SPOTS[spotKey] || SPOTS.conchitas;
-      const now = new Date();
-      const days = [];
+<footer class="mt-8 text-center space-y-1">
+  <div class="fc text-xs font-bold tracking-widest text-slate-400 uppercase">Hecho en Ancón • Barrio & Bodyboard</div>
+  <div class="text-[11px] text-slate-600">Fuente: Open-Meteo Marine & Weather (modelo)</div>
+</footer>
+</div>
 
-      for (let d = 0; d < 3; d++) {
-        const dt = new Date(now);
-        dt.setDate(now.getDate() + d);
-        const yyyy = dt.getFullYear();
-        const mm = String(dt.getMonth() + 1).padStart(2, '0');
-        const dd = String(dt.getDate()).padStart(2, '0');
-        const dateStr = `${yyyy}-${mm}-${dd}`;
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-full opacity-0 pointer-events-none transition-opacity z-50">Parte copiado, pégalo en el grupo</div>
 
-        const hours = [];
-        for (let h = 6; h <= 23; h++) {
-          const waveSwing = Math.sin((h - 6) * 0.35 + d) * 0.25;
-          const height = Math.max(0.6, Number((spot.baseHeight + waveSwing).toFixed(1)));
-          const period = Math.max(10, Math.round(spot.basePeriod + Math.cos(h * 0.3 + d)));
-          const windSpeed = h >= 11 && h <= 17 ? 15 + ((h + d) % 5) : 8 + ((h + d) % 4);
-          const windDir = h >= 11 && h <= 17 ? 215 : 135;
-          const swellDir = 220 + ((h + d * 3) % 25);
+<script>
+/* ============ REPORTE MANUAL DE LA CREW ============
+   Edita esto cuando vayas al agua. "at" = fecha y hora de Lima (ISO). Se muestra solo si tiene menos de 12 h.
+   Ejemplo: conchitas: { at: "2026-11-23T07:30", by: "Tito", text: "1.2 m, limpio, marea baja, bien parejo" } */
+const MANUAL = {
+  conchitas: null,
+  rocas: null,
+  sanjuan: null
+};
 
-          hours.push({
-            hourNum: h,
-            height,
-            period,
-            swellDir,
-            windSpeed,
-            windDir
-          });
-        }
-        days.push({ date: dateStr, hours });
-      }
-      return days;
-    }
+/* ============ SPOTS ============
+   factor: estimación referencial de la altura vs. el modelo (ajústalo con tus observaciones).
+   swell: ventana de dirección útil en grados. off: rango de viento terral (offshore).
+   minP: período mínimo para que funcione. minH: altura mínima en m. maxWind: viento máximo tolerable. */
+const SPOTS = {
+  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[170,240],off:[30,120],minP:12,minH:0.8,maxWind:18,
+    tip:"Prefiere swell sur y marea media."},
+  rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[180,250],off:[30,120],minP:13,minH:1.0,maxWind:18,
+    tip:"Fondo de roca, ojo con la marea baja."},
+  sanjuan:{name:"Playa San Juan",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[180,260],off:[40,130],minP:13,minH:1.3,maxWind:20,
+    tip:"Corriente fuerte. Solo con experiencia y acompañado."}
+};
+const SHIFTS = [
+  {l:"MADRUGADA • 06:00 – 09:00",h:[6,7,8,9]},
+  {l:"MEDIA MAÑANA • 10:00 – 13:00",h:[10,11,12,13]},
+  {l:"TARDE • 14:00 – 17:00",h:[14,15,16,17]},
+  {l:"SUNSET • 18:00 – 20:00",h:[18,19,20]}
+];
+const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+const COLORS=[
+  {dot:'bg-emerald-400',cls:'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',em:'🟢'},
+  {dot:'bg-amber-400',cls:'bg-amber-500/15 text-amber-400 border-amber-500/25',em:'🟡'},
+  {dot:'bg-rose-400',cls:'bg-rose-500/15 text-rose-400 border-rose-500/25',em:'🔴'},
+  {dot:'bg-slate-400',cls:'bg-slate-500/15 text-slate-300 border-slate-500/25',em:'⚪'}
+];
 
-    function initWaveCanvas() {
-      const canvas = document.getElementById('waveCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let phase = 0;
+let spotKey="conchitas", shiftIdx=0, days=[], reqId=0, updatedAt=null;
 
-      function resize() {
-        const ratio = window.devicePixelRatio || 1;
-        canvas.width = Math.max(1, canvas.offsetWidth * ratio);
-        canvas.height = Math.max(1, canvas.offsetHeight * ratio);
-      }
-      window.addEventListener('resize', resize);
-      resize();
+const num=(v,f=null)=>{const n=Number(v);return v!==null&&v!==undefined&&Number.isFinite(n)?n:f};
+const card=d=>DIRS[Math.round((((d%360)+360)%360)/22.5)%16];
+const inRange=(d,[a,b])=>d>=a&&d<=b;
+const $=id=>document.getElementById(id);
+const limaHour=()=>parseInt(new Date().toLocaleString('en-US',{timeZone:'America/Lima',hour:'numeric',hour12:false}),10)%24;
+const limaDate=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Lima'});
 
-      function draw() {
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
+/* ============ EVALUACIÓN ============ */
+function evaluate(x,key){
+  const s=SPOTS[key];
+  const inWindow=x.swD===null||inRange(x.swD,s.swell);
+  const offshore=inRange(x.wd,s.off);
+  const clean=offshore||x.wind<=12;
+  if(!inWindow||x.swH<s.minH*0.7||x.swP<s.minP-3)
+    return{lvl:3,label:"Sin swell útil",c:"Hoy el swell no entra bien a este spot. Plan B: otro spot o a esperar."};
+  if(x.swP>=s.minP+1&&x.swH>=s.minH&&clean)
+    return{lvl:0,label:"Bueno",c:`Entra swell ordenado con ${Math.round(x.swP)}s y viento favorable. A aprovechar.`};
+  if(x.swP>=s.minP&&x.swH>=s.minH*0.8&&x.wind<=s.maxWind)
+    return{lvl:1,label:"Regular",c:"Hay olas surfeables, pero con algo de brisa o menos fuerza. Revisa el mar al llegar."};
+  return{lvl:2,label:"Malo",c:"Viento o período en contra, mar desordenado. Mejor esperar otra ventana."};
+}
 
-        const amp = Math.min(h * 0.34, Math.max(8, animWaveHeight * 12));
-        const freq = 0.008 + (20 - Math.min(18, animWavePeriod)) * 0.0006;
-        const speed = 0.03 + (animWindSpeed * 0.002);
-
-        ctx.beginPath();
-        ctx.moveTo(0, h);
-        for (let x = 0; x <= w; x += 4) {
-          const y = h * 0.58 + Math.sin(x * freq * 0.8 + phase * 0.7 + 1.5) * (amp * 0.7);
-          ctx.lineTo(x, y);
-        }
-        ctx.lineTo(w, h);
-        ctx.fillStyle = 'rgba(14, 165, 233, 0.12)';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(0, h);
-        for (let x = 0; x <= w; x += 4) {
-          const y = h * 0.62 + Math.sin(x * freq + phase) * amp;
-          ctx.lineTo(x, y);
-        }
-        ctx.lineTo(w, h);
-        const grad = ctx.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
-        grad.addColorStop(1, 'rgba(16, 185, 129, 0.08)');
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        phase += speed;
-        requestAnimationFrame(draw);
-      }
-      draw();
-    }
-
-    function selectSpot(key) {
-      if (!SPOTS[key]) return;
-      currentSpotKey = key;
-      document.querySelectorAll('.spot-btn').forEach(btn => {
-        btn.classList.remove('bg-sky-500', 'text-slate-950', 'shadow-sm');
-        btn.classList.add('text-slate-400');
+/* ============ DATOS ============ */
+async function load(){
+  const my=++reqId, key=spotKey, s=SPOTS[key];
+  $('spin').classList.add('animate-spin');
+  setStatus("Cargando…","text-amber-400");
+  const q="&timezone=America%2FLima&forecast_days=3";
+  const mUrl=`https://marine-api.open-meteo.com/v1/marine?latitude=${s.lat}&longitude=${s.lon}&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wave_period,wave_direction,sea_level_height_msl,sea_surface_temperature${q}`;
+  const wUrl=`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&hourly=wind_speed_10m,wind_direction_10m${q}`;
+  const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),8000);
+  try{
+    const [mr,wr]=await Promise.all([fetch(mUrl,{signal:ctl.signal}),fetch(wUrl,{signal:ctl.signal})]);
+    if(!mr.ok||!wr.ok) throw new Error("HTTP");
+    const m=(await mr.json()).hourly, w=(await wr.json()).hourly;
+    if(my!==reqId) return; // llegó tarde, ya cambiaste de spot
+    const g={};
+    m.time.forEach((iso,i)=>{
+      const [d,tm]=iso.split('T'), h=parseInt(tm,10);
+      if(h<6||h>20) return;
+      const swH=num(m.swell_wave_height[i],num(m.wave_height[i]));
+      if(swH===null) return;
+      (g[d]=g[d]||[]).push({
+        h, swH:swH*s.factor,
+        swP:num(m.swell_wave_period[i],num(m.wave_period[i],0)),
+        swD:num(m.swell_wave_direction[i],num(m.wave_direction[i])),
+        tide:num(m.sea_level_height_msl[i]), sst:num(m.sea_surface_temperature[i]),
+        wind:num(w.wind_speed_10m[i],0), wd:num(w.wind_direction_10m[i],0)
       });
-      const activeBtn = document.getElementById(`btn-${key}`);
-      if (activeBtn) {
-        activeBtn.classList.remove('text-slate-400');
-        activeBtn.classList.add('bg-sky-500', 'text-slate-950', 'shadow-sm');
-      }
-
-      document.getElementById('spotTitle').textContent = SPOTS[key].name;
-      document.getElementById('cardBreakBadge').textContent = SPOTS[key].breakTag;
-      document.getElementById('cardPowerLevel').textContent = SPOTS[key].powerText;
-      fetchSurfData();
-    }
-
-    function changeShift(delta) {
-      currentShiftIndex = (currentShiftIndex + delta + SHIFTS.length) % SHIFTS.length;
-      updateShiftCard();
-    }
-
-    function setShift(idx) {
-      currentShiftIndex = idx;
-      updateShiftCard();
-    }
-
-    function getCardinalDirection(deg) {
-      const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
-      const normalized = ((safeNum(deg, 0) % 360) + 360) % 360;
-      return dirs[Math.round(normalized / 22.5) % 16];
-    }
-
-    function evaluateCondition(height, period, windSpeed, windDeg, spotKey) {
-      const isOffshore = windDeg >= 65 && windDeg <= 155;
-
-      if (spotKey === 'conchitas') {
-        if (period >= 14 && height >= 1.1 && (isOffshore || windSpeed <= 14)) {
-          return {
-            label: "Derecha Limpia / Tubera",
-            dotColor: "bg-emerald-400",
-            badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
-            comment: `"Habla causa, está entrando buena derecha con ${period}s y viento suave. Paredes limpias pa' correrla toda y meterle su buen rolo."`
-          };
-        } else if (period >= 12 && windSpeed <= 20) {
-          return {
-            label: "Derecha Corrible",
-            dotColor: "bg-amber-400",
-            badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-            comment: `"Hay derechas divertidas en Las Conchitas con algo de brisa. Buen ritmo pa' agarrar secciones rápidas y pegar en el labio."`
-          };
-        } else {
-          return {
-            label: "Movido / Viento Cruzado",
-            dotColor: "bg-rose-400",
-            badgeClass: "bg-rose-500/15 text-rose-400 border-rose-500/25",
-            comment: `"El mar está algo movido en Conchitas. Toca remarla con paciencia y chapar las derechas más ordenadas de la serie."`
-          };
-        }
-      }
-
-      if (spotKey === 'rocas') {
-        if (period >= 14 && height >= 1.1 && (isOffshore || windSpeed <= 14)) {
-          return {
-            label: "Izquierda Afilada / Power",
-            dotColor: "bg-emerald-400",
-            badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
-            comment: `"En Las Rocas están saliendo izquierdas bien cuadradas con ${period}s. Hueca y rápida pa' buscar tubo o volar en la sección."`
-          };
-        } else if (period >= 12 && windSpeed <= 20) {
-          return {
-            label: "Izquierda Maniobrable",
-            dotColor: "bg-amber-400",
-            badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-            comment: `"Buenas izquierdas con fuerza en Las Rocas. Ojito con el fondo y entra con decisión en el drop."`
-          };
-        } else {
-          return {
-            label: "Orillero Pesado / Chopy",
-            dotColor: "bg-rose-400",
-            badgeClass: "bg-rose-500/15 text-rose-400 border-rose-500/25",
-            comment: `"Reventando medio desordenado en Las Rocas por el viento. Solo pa' los que no arrugan, cuida el corcho."`
-          };
-        }
-      }
-
-      if (period >= 14 && height >= 1.3 && (isOffshore || windSpeed <= 15)) {
-        return {
-          label: "Bombas Izq & Der • Fuego",
-          dotColor: "bg-emerald-400",
-          badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
-          comment: `"¡Se armó en Playa San Juan! Están entrando bombas pesadas de izquierda y derecha con ${period}s. Pura fuerza en Pasamayo pa' los bravos."`
-        };
-      } else if (period >= 12 && windSpeed <= 21) {
-        return {
-          label: "Series Pesadas Izq & Der",
-          dotColor: "bg-amber-400",
-          badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-          comment: `"Playa San Juan está botando buenas bombas pa' ambos lados con harto power. Lleva buenas aletas porque la corriente jala."`
-        };
-      } else {
-        return {
-          label: "Mar Bravo / Muy Movido",
-          dotColor: "bg-rose-400",
-          badgeClass: "bg-rose-500/15 text-rose-400 border-rose-500/25",
-          comment: `"Bombas desordenadas y harto viento en Playa San Juan. Revisa bien el canal antes de mandarte al agua."`
-        };
-      }
-    }
-
-    function updateShiftCard() {
-      if (!forecastDays.length) return;
-      const todayHours = forecastDays[0].hours;
-      const shift = SHIFTS[currentShiftIndex];
-
-      document.getElementById('shiftBadge').textContent = shift.label;
-      document.querySelectorAll('.shift-dot').forEach((dot, i) => {
-        if (i === currentShiftIndex) {
-          dot.classList.remove('w-1.5', 'bg-slate-700');
-          dot.classList.add('w-5', 'bg-sky-400');
-        } else {
-          dot.classList.remove('w-5', 'bg-sky-400');
-          dot.classList.add('w-1.5', 'bg-slate-700');
-        }
-      });
-
-      const matching = todayHours.filter(h => shift.hours.includes(h.hourNum));
-      if (!matching.length) return;
-
-      const avgH = parseFloat((matching.reduce((s, x) => s + x.height, 0) / matching.length).toFixed(1));
-      const avgP = Math.round(matching.reduce((s, x) => s + x.period, 0) / matching.length);
-      const avgW = Math.round(matching.reduce((s, x) => s + x.windSpeed, 0) / matching.length);
-      const midSample = matching[Math.floor(matching.length / 2)];
-      const dirText = getCardinalDirection(midSample.swellDir);
-
-      animWaveHeight = avgH;
-      animWavePeriod = avgP;
-      animWindSpeed = avgW;
-
-      const cond = evaluateCondition(avgH, avgP, avgW, midSample.windDir, currentSpotKey);
-
-      document.getElementById('cardWaveHeight').textContent = `${avgH.toFixed(1)}m`;
-      document.getElementById('cardWavePeriod').textContent = `${avgP}s`;
-      document.getElementById('cardWindSpeed').textContent = `${avgW}`;
-      document.getElementById('cardWindLabel').textContent = `Viento ${getCardinalDirection(midSample.windDir)} km/h`;
-      document.getElementById('cardSwellDir').textContent = `${Math.round(midSample.swellDir)}° ${dirText}`;
-      document.getElementById('cardComment').textContent = cond.comment;
-
-      const badge = document.getElementById('cardConditionBadge');
-      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] lg:text-xs font-semibold border ${cond.badgeClass}`;
-      badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cond.dotColor}"></span> ${cond.label}`;
-    }
-
-    function shareWhatsApp() {
-      const spotName = SPOTS[currentSpotKey].name;
-      const breakTag = SPOTS[currentSpotKey].breakTag;
-      const shiftLabel = document.getElementById('shiftBadge').textContent;
-      const height = document.getElementById('cardWaveHeight').textContent;
-      const period = document.getElementById('cardWavePeriod').textContent;
-      const wind = document.getElementById('cardWindSpeed').textContent;
-      const comment = document.getElementById('cardComment').textContent;
-
-      const text = `🏄‍♂️ *REPORTE ANCÓN SWELL CREW (KM 43)*\n📍 *Playa:* ${spotName} (${breakTag})\n⏰ *Turno:* ${shiftLabel}\n🌊 *Olas:* ${height} | *Período:* ${period} | *Viento:* ${wind} km/h\n💬 ${comment}\n\nChequea el reporte en vivo: ${window.location.href}`;
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {});
-        const toast = document.getElementById('toastMsg');
-        toast.classList.remove('opacity-0');
-        setTimeout(() => toast.classList.add('opacity-0'), 2800);
-      }
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function toggleAccordion(dayIndex) {
-      const content = document.getElementById(`acc-content-${dayIndex}`);
-      const icon = document.getElementById(`acc-icon-${dayIndex}`);
-      if (content) content.classList.toggle('open');
-      if (icon) icon.classList.toggle('rotated');
-    }
-
-    function formatDayHeader(dateStr, index) {
-      const dateObj = new Date(dateStr + 'T12:00:00');
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      const dayName = days[dateObj.getDay()];
-      const dayNum = dateObj.getDate();
-      const monthName = months[dateObj.getMonth()];
-      const tag = index === 0 ? ' (Hoy)' : index === 1 ? ' (Mañana)' : '';
-      return `${dayName} ${dayNum} ${monthName}${tag}`;
-    }
-
-    function renderAccordions() {
-      const container = document.getElementById('accordionsContainer');
-      container.innerHTML = '';
-
-      forecastDays.forEach((day, idx) => {
-        const maxH = Math.max(...day.hours.map(h => h.height)).toFixed(1);
-        const avgP = Math.round(day.hours.reduce((s, x) => s + x.period, 0) / day.hours.length);
-        const isFirst = idx === 0;
-
-        const rowsHtml = day.hours.map(h => {
-          const cond = evaluateCondition(h.height, h.period, h.windSpeed, h.windDir, currentSpotKey);
-          const barPct = Math.min(100, Math.round((h.height / 2.6) * 100));
-          const hourLabel = `${String(h.hourNum).padStart(2, '0')}:00`;
-          const windCardinal = getCardinalDirection(h.windDir);
-
-          return `
-            <div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 last:border-none text-xs lg:text-sm hover:bg-slate-800/30 transition">
-              <div class="col-span-2 font-mono font-semibold text-slate-300">${hourLabel}</div>
-              <div class="col-span-4 pr-3">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="font-display font-bold text-white">${h.height.toFixed(1)}m</span>
-                  <span class="text-[10px] lg:text-xs text-sky-400 font-semibold">${h.period}s</span>
-                </div>
-                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full" style="width: ${barPct}%"></div>
-                </div>
-              </div>
-              <div class="col-span-4 text-center text-slate-300">
-                <span class="font-medium">${Math.round(h.windSpeed)} km/h</span>
-                <span class="text-[10px] lg:text-xs text-slate-500 ml-1">${windCardinal}</span>
-              </div>
-              <div class="col-span-2 flex justify-end">
-                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-900 border border-slate-800" title="${cond.label}">
-                  <span class="w-2 h-2 rounded-full ${cond.dotColor}"></span>
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        const cardHtml = `
-          <div class="rounded-2xl bg-[#101724] border border-slate-800/90 overflow-hidden shadow-md">
-            <button onclick="toggleAccordion(${idx})" class="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/30 transition">
-              <div>
-                <div class="font-display font-bold text-sm lg:text-base text-white">${formatDayHeader(day.date, idx)}</div>
-                <div class="text-[11px] lg:text-xs text-slate-400 mt-0.5">06:00 AM – 11:00 PM • Máx ${maxH}m • ${avgP}s</div>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  ${maxH}m
-                </span>
-                <svg id="acc-icon-${idx}" class="chevron-icon w-4 h-4 text-slate-400 ${isFirst ? 'rotated' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </div>
-            </button>
-            <div id="acc-content-${idx}" class="accordion-content ${isFirst ? 'open' : ''} border-t border-slate-800/80 bg-[#0b101b]">
-              <div class="grid grid-cols-12 px-4 py-2.5 text-[10px] lg:text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/70 border-b border-slate-800/80">
-                <div class="col-span-2">Hora</div>
-                <div class="col-span-4">Ola / Período</div>
-                <div class="col-span-4 text-center">Viento</div>
-                <div class="col-span-2 text-right">Estado</div>
-              </div>
-              ${rowsHtml}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
-      });
-    }
-
-    async function fetchSurfData() {
-      const icon = document.getElementById('refreshIcon');
-      const liveIndicator = document.getElementById('liveIndicator');
-      if (icon) icon.classList.add('animate-spin');
-
-      liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-400";
-      liveIndicator.innerHTML = `
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-        </span>
-        CONECTANDO...
-      `;
-
-      const spot = SPOTS[currentSpotKey];
-      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wave_height,wave_period,wave_direction&timezone=America%2FLima&forecast_days=3`;
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&hourly=wind_speed_10m,wind_direction_10m&timezone=America%2FLima&forecast_days=3`;
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-
-      try {
-        const [marineRes, weatherRes] = await Promise.all([
-          fetch(marineUrl, { signal: controller.signal }),
-          fetch(weatherUrl, { signal: controller.signal })
-        ]);
-        clearTimeout(timeoutId);
-
-        if (!marineRes.ok || !weatherRes.ok) {
-          throw new Error(`HTTP ${marineRes.status} / ${weatherRes.status}`);
-        }
-
-        const marineData = await marineRes.json();
-        const weatherData = await weatherRes.json();
-
-        if (!marineData?.hourly?.time || !marineData?.hourly?.wave_height) {
-          throw new Error("Sin datos horarios");
-        }
-
-        const times = marineData.hourly.time;
-        const grouped = {};
-
-        times.forEach((isoTime, i) => {
-          const [datePart, timePart] = String(isoTime).split('T');
-          if (!datePart || !timePart) return;
-          const hourNum = parseInt(timePart.split(':')[0], 10);
-
-          if (hourNum >= 6 && hourNum <= 23) {
-            if (!grouped[datePart]) grouped[datePart] = [];
-            const rawH = marineData.hourly.wave_height[i];
-            if (rawH !== null && rawH !== undefined && !Number.isNaN(Number(rawH))) {
-              grouped[datePart].push({
-                hourNum,
-                height: Number(rawH) * spot.factor,
-                period: Math.round(safeNum(marineData.hourly.wave_period?.[i], 12)),
-                swellDir: safeNum(marineData.hourly.wave_direction?.[i], 225),
-                windSpeed: safeNum(weatherData?.hourly?.wind_speed_10m?.[i], 8),
-                windDir: safeNum(weatherData?.hourly?.wind_direction_10m?.[i], 180)
-              });
-            }
-          }
-        });
-
-        const parsedDays = Object.keys(grouped).slice(0, 3).map(date => ({
-          date,
-          hours: grouped[date]
-        }));
-
-        if (parsedDays.length > 0 && parsedDays[0].hours.length > 0) {
-          forecastDays = parsedDays;
-          liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-400";
-          liveIndicator.innerHTML = `
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            EN VIVO
-          `;
-          document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • ${formatDayHeader(forecastDays[0].date, 0)}`;
-        } else {
-          throw new Error("Sin horas válidas");
-        }
-      } catch (err) {
-        clearTimeout(timeoutId);
-        forecastDays = buildFallbackForecast(currentSpotKey);
-        liveIndicator.className = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-400";
-        liveIndicator.innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          ESTIMADO
-        `;
-        document.getElementById('spotSubtitle').textContent = `${spot.subtitle} • Referencia local`;
-      } finally {
-        document.getElementById('cardBreakBadge').textContent = spot.breakTag;
-        document.getElementById('cardPowerLevel').textContent = spot.powerText;
-        updateShiftCard();
-        renderAccordions();
-        if (icon) icon.classList.remove('animate-spin');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initWaveCanvas();
-      fetchSurfData();
     });
-  </script>
+    const out=Object.keys(g).slice(0,3).map(date=>({date,hours:g[date]}));
+    if(!out.length) throw new Error("vacío");
+    days=out; updatedAt=new Date();
+    const hhmm=updatedAt.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',timeZone:'America/Lima'});
+    setStatus(`Pronóstico • act. ${hhmm}`,"text-emerald-400");
+    render();
+  }catch(e){
+    if(my!==reqId) return;
+    days=[]; $('acc').innerHTML=`<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-sm text-slate-300">No pudimos cargar el pronóstico. <b>No mostramos datos inventados.</b><br>Revisa el mar en persona o toca actualizar.</div>`;
+    ['mH','mP','mW','mD','mT','mS'].forEach(i=>$(i).textContent='--');
+    $('cond').className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border border-slate-700';
+    $('cond').textContent='Sin datos'; $('comment').textContent='Sin conexión con el modelo.';
+    setStatus("Sin datos","text-rose-400");
+  }finally{
+    clearTimeout(t);
+    if(my===reqId) $('spin').classList.remove('animate-spin');
+  }
+}
+function setStatus(t,c){const e=$('status');e.textContent=t;e.className=`text-[11px] font-semibold uppercase tracking-wider ${c}`}
+
+/* ============ UI ============ */
+function renderNav(){
+  $('nav').innerHTML=Object.entries(SPOTS).map(([k,s])=>
+    `<button onclick="selectSpot('${k}')" class="py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold transition ${k===spotKey?'bg-sky-500 text-slate-950':'text-slate-400 hover:text-white'}">${k==='sanjuan'?'San Juan':s.name}</button>`).join('');
+}
+function selectSpot(k){spotKey=k;renderNav();header();days=[];load()}
+function header(){
+  const s=SPOTS[spotKey];
+  $('spotTitle').textContent=s.name; $('spotSub').textContent=`${s.sub} • ${s.tip}`; $('tag').textContent=s.tag;
+}
+function shift(d){setShift((shiftIdx+d+SHIFTS.length)%SHIFTS.length)}
+function setShift(i){shiftIdx=i;card_()}
+function avg(a,f){return a.reduce((s,x)=>s+f(x),0)/a.length}
+
+function card_(){
+  $('shiftLabel').textContent=SHIFTS[shiftIdx].l;
+  $('dots').innerHTML=SHIFTS.map((_,i)=>`<button aria-label="Turno ${i+1}" onclick="setShift(${i})" class="h-1.5 rounded-full transition-all ${i===shiftIdx?'w-5 bg-sky-400':'w-1.5 bg-slate-700'}"></button>`).join('');
+  showManual();
+  if(!days.length) return;
+  const hs=days[0].hours.filter(x=>SHIFTS[shiftIdx].h.includes(x.h));
+  if(!hs.length){$('cond').textContent='Turno ya pasó';$('comment').textContent='Mira el siguiente turno o mañana.';return}
+  const mid=hs[Math.floor(hs.length/2)];
+  const a={swH:avg(hs,x=>x.swH),swP:avg(hs,x=>x.swP),wind:avg(hs,x=>x.wind),wd:mid.wd,swD:mid.swD};
+  const ev=evaluate(a,spotKey), co=COLORS[ev.lvl];
+  $('mH').textContent=a.swH.toFixed(1); $('mP').textContent=Math.round(a.swP)+'s';
+  $('mW').textContent=Math.round(a.wind); $('mWl').textContent=`Viento ${card(a.wd)} km/h`;
+  $('mD').textContent=a.swD===null?'--':`${Math.round(a.swD)}° ${card(a.swD)}`;
+  const t0=hs[0].tide,t1=hs[hs.length-1].tide;
+  $('mT').textContent=t0===null?'--':`${avg(hs.filter(x=>x.tide!==null),x=>x.tide).toFixed(1)}m ${t1>t0?'↑':t1<t0?'↓':''}`;
+  const sst=mid.sst; $('mS').textContent=sst===null?'--':`${sst.toFixed(0)}°C`;
+  $('comment').textContent=ev.c;
+  $('cond').className=`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${co.cls}`;
+  $('cond').innerHTML=`<span class="w-1.5 h-1.5 rounded-full ${co.dot}"></span>${ev.label}`;
+}
+function showManual(){
+  const m=MANUAL[spotKey], el=$('manual');
+  if(m&&m.at&&(Date.now()-new Date(m.at+'-05:00').getTime())<12*3600e3){
+    const hh=new Date(m.at+'-05:00').toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',timeZone:'America/Lima'});
+    el.textContent=`📍 Reporte de la crew (${m.by||'crew'}, ${hh}): ${m.text}`; el.classList.remove('hidden');
+  }else el.classList.add('hidden');
+}
+function dayName(d,i){
+  const dt=new Date(d+'T12:00:00'), n=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'], m=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${n[dt.getDay()]} ${dt.getDate()} ${m[dt.getMonth()]}${i===0?' (Hoy)':i===1?' (Mañana)':''}`;
+}
+function toggle(i){$('c'+i).classList.toggle('open');$('i'+i).classList.toggle('rotate-180')}
+function renderAcc(){
+  $('acc').innerHTML=days.map((day,i)=>{
+    const max=Math.max(...day.hours.map(x=>x.swH)).toFixed(1);
+    const best=Math.min(...day.hours.map(x=>evaluate(x,spotKey).lvl));
+    const rows=day.hours.map(x=>{
+      const ev=evaluate(x,spotKey), co=COLORS[ev.lvl];
+      return `<div class="grid grid-cols-12 items-center py-3 px-4 border-b border-slate-800/60 text-xs lg:text-sm">
+        <div class="col-span-2 font-mono font-semibold text-slate-300">${String(x.h).padStart(2,'0')}:00</div>
+        <div class="col-span-3"><span class="fd font-bold">${x.swH.toFixed(1)}m</span> <span class="text-sky-400 text-[11px]">${Math.round(x.swP)}s</span></div>
+        <div class="col-span-3 text-slate-300">${Math.round(x.wind)} km/h <span class="text-slate-500 text-[11px]">${card(x.wd)}</span></div>
+        <div class="col-span-4 flex justify-end items-center gap-1.5"><span class="w-2 h-2 rounded-full ${co.dot}"></span><span class="text-[11px] text-slate-300">${ev.label}</span></div>
+      </div>`}).join('');
+    const open=i===0;
+    return `<div class="rounded-2xl bg-[#101724] border border-slate-800 overflow-hidden">
+      <button onclick="toggle(${i})" class="w-full flex items-center justify-between p-4 text-left">
+        <div><div class="fd font-bold text-sm text-white">${dayName(day.date,i)}</div>
+        <div class="text-[11px] text-slate-400 mt-0.5">Máx ${max}m • mejor franja: ${COLORS[best].em}</div></div>
+        <svg id="i${i}" class="w-4 h-4 text-slate-400 transition-transform ${open?'rotate-180':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div id="c${i}" class="acc ${open?'open':''} border-t border-slate-800 bg-[#0b101b]">
+        <div class="grid grid-cols-12 px-4 py-2 text-[10px] font-bold uppercase text-slate-500 bg-slate-900/70"><div class="col-span-2">Hora</div><div class="col-span-3">Swell</div><div class="col-span-3">Viento</div><div class="col-span-4 text-right">Estado</div></div>
+        ${rows}
+      </div></div>`;
+  }).join('');
+}
+function render(){
+  // abre en el turno actual si hoy aún queda algo
+  const h=limaHour();
+  const idx=SHIFTS.findIndex(s=>s.h.includes(h));
+  if(days[0]&&days[0].date===limaDate()&&idx>=0&&!render.done){shiftIdx=idx;render.done=true}
+  card_(); renderAcc();
+}
+function share(){
+  const s=SPOTS[spotKey];
+  const txt=`🏄 *ANCÓN SWELL CREW*\n📍 ${s.name} (${s.tag})\n⏰ ${$('shiftLabel').textContent}\n🌊 Swell ${$('mH').textContent}m | ${$('mP').textContent} | Viento ${$('mW').textContent} km/h\n✅ ${$('cond').textContent.trim()}\n(Pronóstico de modelo, verifica el mar)\n\n${location.href}`;
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).catch(()=>{});
+  const t=$('toast'); t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'),2500);
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+document.addEventListener('DOMContentLoaded',()=>{renderNav();header();card_();load()});
+</script>
 </body>
 </html>
