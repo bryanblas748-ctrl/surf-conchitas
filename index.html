@@ -12,7 +12,7 @@
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
-body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),transparent 55%);color:#f8fafc;font-family:Inter,sans-serif}
+:root{--ac:#38bdf8}body{background:radial-gradient(ellipse at 85% -5%,rgba(251,146,60,.30),transparent 45%),linear-gradient(180deg,#0b2f45 0,#08151f 380px,#06090f 100%);background-color:#06090f;background-repeat:no-repeat;color:#f8fafc;font-family:Inter,sans-serif}
 .fd{font-family:'Space Grotesk',sans-serif}.fc{font-family:'Chakra Petch',sans-serif}
 .acc{max-height:0;overflow:hidden;transition:max-height .35s ease}.acc.open{max-height:2400px}
 @media(min-width:1024px){.wrap{max-width:1120px!important}.grid2{display:grid;grid-template-columns:400px 1fr;gap:2rem;align-items:start}.sticky2{position:sticky;top:2rem}}
@@ -21,6 +21,18 @@ body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),tr
 <body class="min-h-screen pb-14">
 <div class="wrap max-w-md mx-auto px-4 pt-6">
 
+<div class="relative overflow-hidden rounded-3xl mb-4 border border-white/10" style="background:linear-gradient(180deg,#0e4a68 0%,#f59e0b 135%)">
+  <svg viewBox="0 0 400 130" class="w-full block" style="min-height:110px" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <circle cx="310" cy="78" r="46" fill="#fbbf24" opacity=".25"/><circle cx="310" cy="78" r="30" fill="#fde68a"/>
+    <path d="M0 88 Q50 80 100 88 T200 88 T300 88 T400 88 V130 H0Z" fill="#0b3a55"/>
+    <g fill="#06111c"><rect x="30" y="76" width="200" height="4"/><rect x="40" y="80" width="3" height="18"/><rect x="64" y="80" width="3" height="18"/><rect x="88" y="80" width="3" height="18"/><rect x="112" y="80" width="3" height="18"/><rect x="136" y="80" width="3" height="18"/><rect x="160" y="80" width="3" height="18"/><rect x="184" y="80" width="3" height="18"/><rect x="208" y="80" width="3" height="18"/><rect x="216" y="64" width="14" height="14"/></g>
+    <path d="M0 104 Q50 96 100 104 T200 104 T300 104 T400 104 V130 H0Z" fill="#082033"/>
+  </svg>
+  <div class="absolute left-4 top-3">
+    <p class="fc text-[11px] tracking-[.25em] text-amber-100/90">BALNEARIO DE ANCÓN</p>
+    <p class="fc text-2xl font-bold text-white">SWELL CREW</p>
+  </div>
+</div>
 <header class="flex items-start justify-between mb-5">
   <div>
     <div class="flex flex-wrap items-center gap-2 mb-1.5">
@@ -46,18 +58,19 @@ body{background:#06090f radial-gradient(circle at 50% 0%,rgba(14,165,233,.08),tr
 <div class="sticky2 mb-6">
   <div class="flex items-center justify-between mb-2.5 px-1">
     <button onclick="shift(-1)" aria-label="Turno anterior" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">‹</button>
-    <span id="shiftLabel" class="text-[11px] font-bold tracking-wider uppercase text-sky-400"></span>
+    <span id="shiftLabel" class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--ac)"></span>
     <button onclick="shift(1)" aria-label="Turno siguiente" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">›</button>
   </div>
 
-  <div class="rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0b101b] border border-slate-800 p-5 shadow-2xl">
+  <div class="rounded-3xl bg-gradient-to-b from-[#131c2e] to-[#0b101b] border border-slate-800 p-5 shadow-2xl" style="border-top:3px solid var(--ac)">
     <div class="flex items-center justify-between mb-4">
       <span id="cond" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border border-slate-700">—</span>
       <span id="tag" class="px-2.5 py-1 rounded-md text-[10px] fc font-bold uppercase bg-sky-500/10 text-sky-300 border border-sky-500/20"></span>
     </div>
+    <div id="hero" class="rounded-2xl px-4 py-3 mb-4 border border-slate-700"><div class="text-[11px] opacity-80">Condición del turno</div><div id="heroT" class="fc text-3xl font-bold tracking-wide uppercase">--</div></div>
     <div class="grid grid-cols-3 divide-x divide-slate-800 text-center">
       <div class="px-2"><div id="mH" class="fd text-3xl font-bold">--</div><div class="text-[11px] text-slate-400 mt-1">Swell (m)</div></div>
-      <div class="px-2"><div id="mP" class="fd text-3xl font-bold text-sky-400">--</div><div class="text-[11px] text-slate-400 mt-1">Período</div></div>
+      <div class="px-2"><div id="mP" class="fd text-3xl font-bold" style="color:var(--ac)">--</div><div class="text-[11px] text-slate-400 mt-1">Período</div></div>
       <div class="px-2"><div id="mW" class="fd text-3xl font-bold">--</div><div id="mWl" class="text-[11px] text-slate-400 mt-1">Viento km/h</div></div>
     </div>
     <div class="grid grid-cols-3 gap-2 mt-4 text-center text-[11px]">
@@ -120,11 +133,11 @@ const MANUAL = {
    swell: ventana de dirección útil en grados. [0,360] = acepta cualquier dirección (norte, noroeste, sur, suroeste). Cuando sepas qué dirección funciona en cada spot, acota aquí, por ejemplo [270,360] para noroeste-norte. off: rango de viento terral (offshore).
    minP: período mínimo para que funcione. minH: altura mínima en m. maxWind: viento máximo tolerable. */
 const SPOTS = {
-  conchitas:{name:"Las Conchitas",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],ideal:[[202,370]],off:[30,120],minP:12,minH:0.8,maxWind:18,
+  conchitas:{name:"Las Conchitas",ac:"#38bdf8",sub:"Point break • Derechas • Ancón",tag:"DERECHA • POINT",lat:-11.77,lon:-77.21,factor:1.0,swell:[0,360],ideal:[[202,370]],off:[30,120],minP:12,minH:0.8,maxWind:18,
     tip:"Le pega mejor swell noroeste, oeste y suroeste."},
-  rocas:{name:"Las Rocas",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[0,360],off:[30,120],minP:13,minH:1.0,maxWind:18,
+  rocas:{name:"Las Rocas",ac:"#2dd4bf",sub:"Reef • Izquierdas • Ancón",tag:"IZQUIERDA • REEF",lat:-11.78,lon:-77.22,factor:1.15,swell:[0,360],off:[30,120],minP:13,minH:1.0,maxWind:18,
     tip:"Fondo de roca, ojo con la marea baja."},
-  sanjuan:{name:"Playa San Juan",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[0,360],off:[40,130],minP:13,minH:1.3,maxWind:20,
+  sanjuan:{name:"Playa San Juan",ac:"#fb923c",sub:"Pasamayo • Izq. y der. • Pesada",tag:"IZQ & DER • BOMBAS",lat:-11.62,lon:-77.27,factor:1.35,swell:[0,360],off:[40,130],minP:13,minH:1.3,maxWind:20,
     tip:"Corriente fuerte. Solo con experiencia y acompañado."}
 };
 const SHIFTS = [
@@ -269,12 +282,12 @@ function setStatus(t,c){const e=$('status');e.textContent=t;e.className=`text-[1
 /* ============ UI ============ */
 function renderNav(){
   $('nav').innerHTML=Object.entries(SPOTS).map(([k,s])=>
-    `<button onclick="selectSpot('${k}')" class="py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold transition ${k===spotKey?'bg-sky-500 text-slate-950':'text-slate-400 hover:text-white'}">${k==='sanjuan'?'San Juan':s.name}</button>`).join('');
+    `<button onclick="selectSpot('${k}')" class="py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold transition ${k===spotKey?'text-slate-950':'text-slate-400 hover:text-white'}" style="${k===spotKey?'background:'+SPOTS[k].ac:''}">${k==='sanjuan'?'San Juan':s.name}</button>`).join('');
 }
 function selectSpot(k){spotKey=k;renderNav();header();days=[];load()}
 function header(){
   const s=SPOTS[spotKey];
-  $('spotTitle').textContent=s.name; $('tag').textContent=s.tag;
+  $('spotTitle').textContent=s.name; $('tag').textContent=s.tag; document.documentElement.style.setProperty('--ac',s.ac);
   let now='';
   if(days[0]&&days[0].date===limaDate()){
     const h=limaHour(), x=days[0].hours.reduce((b,c)=>Math.abs(c.h-h)<Math.abs(b.h-h)?c:b);
@@ -308,6 +321,9 @@ function card_(){
   $('calNote').textContent=calInfo.ok?`Altura calibrada con ${calInfo.n} reportes de la crew (factor ${calInfo.f.toFixed(2)})`:`Altura estimada, aún sin calibrar (${calInfo.n}/5 reportes con altura)`;
   $('cond').className=`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${co.cls}`;
   $('cond').innerHTML=`<span class="w-1.5 h-1.5 rounded-full ${co.dot}"></span>${ev.label}`;
+  const HC=['bg-emerald-500/20 text-emerald-300 border-emerald-500/40','bg-amber-500/20 text-amber-300 border-amber-500/40','bg-rose-500/20 text-rose-300 border-rose-500/40','bg-slate-500/20 text-slate-300 border-slate-500/40'];
+  $('hero').className=`rounded-2xl px-4 py-3 mb-4 border ${HC[ev.lvl]}`;
+  $('heroT').textContent=ev.label;
 }
 function showManual(){
   const m=MANUAL[spotKey], el=$('manual');
