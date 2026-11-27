@@ -106,6 +106,8 @@
     <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Mapa de oleaje</h2>
     <span class="text-[11px] text-slate-500">Usa la barra de abajo para ver las horas</span>
   </div>
+  <p id="peak" class="mb-2 px-1 text-xs text-slate-200"></p>
+  <div id="layerBtns" class="flex flex-wrap gap-2 mb-3 px-1"></div>
   <div class="rounded-2xl overflow-hidden border border-slate-800 bg-[#0b101b]">
     <iframe id="waveMap" title="Mapa de oleaje frente a Ancón" loading="lazy" class="w-full block" style="height:460px;border:0"></iframe>
   </div>
@@ -295,9 +297,21 @@ function renderNav(){
   $('nav').innerHTML=Object.entries(SPOTS).map(([k,s])=>
     `<button onclick="selectSpot('${k}')" class="py-2.5 px-2 rounded-xl text-xs lg:text-sm font-bold transition ${k===spotKey?'text-slate-950':'text-slate-400 hover:text-white'}" style="${k===spotKey?'background:'+SPOTS[k].ac:''}">${k==='sanjuan'?'San Juan':s.name}</button>`).join('');
 }
+let mapLayer='swell1';
+const LAYERS=[['swell1','Swell principal'],['swell2','Swell secundario'],['waves','Oleaje total']];
+function layerBtns(){
+  $('layerBtns').innerHTML=LAYERS.map(([k,n])=>`<button onclick="setLayer('${k}')" class="px-3 py-1.5 rounded-full text-xs font-semibold border ${k===mapLayer?'text-slate-950 border-transparent':'text-slate-300 border-slate-700'}" style="${k===mapLayer?'background:var(--ac)':''}">${n}</button>`).join('');
+}
+function setLayer(l){mapLayer=l;layerBtns();updateMap()}
+function showPeak(){
+  if(!days.length){$('peak').textContent='';return}
+  let best=null,di=0;
+  days.forEach((d,i)=>d.hours.forEach(x=>{if(!best||x.swH>best.swH){best=x;di=i}}));
+  $('peak').textContent=`Pico del swell en los próximos días: ${dayName(days[di].date,di)}, ${fmtHour(best.h)} • ${best.swH.toFixed(1)} m, ${Math.round(best.swP)} s${best.swD!==null?', del '+full(best.swD).toLowerCase():''}`;
+}
 function updateMap(){
   const s=SPOTS[spotKey];
-  $('waveMap').src=`https://embed.windy.com/embed2.html?lat=${s.lat}&lon=${s.lon}&detailLat=${s.lat}&detailLon=${s.lon}&zoom=6&level=surface&overlay=waves&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+  $('waveMap').src=`https://embed.windy.com/embed2.html?lat=${s.lat}&lon=${s.lon}&detailLat=${s.lat}&detailLon=${s.lon}&zoom=6&level=surface&overlay=${mapLayer}&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
 }
 function selectSpot(k){spotKey=k;renderNav();header();days=[];updateMap();load()}
 function header(){
@@ -403,7 +417,7 @@ function render(){
   const h=limaHour();
   const idx=SHIFTS.findIndex(s=>s.h.includes(h));
   if(days[0]&&days[0].date===limaDate()&&idx>=0&&!render.done){shiftIdx=idx;render.done=true}
-  header(); card_(); renderAcc();
+  header(); card_(); renderAcc(); showPeak();
 }
 function share(){
   const s=SPOTS[spotKey];
@@ -412,7 +426,7 @@ function share(){
   const t=$('toast'); t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'),2500);
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
-document.addEventListener('DOMContentLoaded',()=>{renderNav();header();card_();updateMap();if(FORM_URL){$('formLink').href=FORM_URL;$('formLink').classList.remove('hidden')}load()});
+document.addEventListener('DOMContentLoaded',()=>{renderNav();header();card_();layerBtns();updateMap();if(FORM_URL){$('formLink').href=FORM_URL;$('formLink').classList.remove('hidden')}load()});
 </script>
 </body>
 </html>
