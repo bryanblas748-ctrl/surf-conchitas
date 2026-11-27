@@ -97,6 +97,8 @@
     <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pronóstico horario (6 AM – 8 PM)</h2>
     <span class="text-[11px] text-slate-500">Toca para desplegar</span>
   </div>
+  <div id="strip" class="flex gap-2 overflow-x-auto pb-2"></div>
+  <p class="text-[11px] text-slate-500 mb-3 px-1">Pasados 3 o 4 días el modelo es menos preciso: úsalo para ver la tendencia.</p>
   <div id="acc" class="space-y-3"></div>
 </div>
 </div>
@@ -203,7 +205,7 @@ async function load(){
   const my=++reqId, key=spotKey, s=SPOTS[key];
   $('spin').classList.add('animate-spin');
   setStatus("Cargando…","text-amber-400");
-  const q="&timezone=America%2FLima&past_days=7&forecast_days=3";
+  const q="&timezone=America%2FLima&past_days=7&forecast_days=7";
   const mUrl=`https://marine-api.open-meteo.com/v1/marine?latitude=${s.lat}&longitude=${s.lon}&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wave_period,wave_direction,sea_level_height_msl,sea_surface_temperature${q}`;
   const wUrl=`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&hourly=wind_speed_10m,wind_direction_10m${q}`;
   const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),8000);
@@ -228,7 +230,7 @@ async function load(){
         wind:num(w.wind_speed_10m[i],0), wd:num(w.wind_direction_10m[i],0)
       });
     });
-    const out=Object.keys(g).slice(0,3).map(date=>({date,hours:g[date]}));
+    const out=Object.keys(g).slice(0,7).map(date=>({date,hours:g[date]}));
     if(!out.length) throw new Error("vacío");
     out.forEach(d=>{
       const t=d.hours.map(x=>x.tide).filter(v=>v!==null);
@@ -242,7 +244,7 @@ async function load(){
     render();
   }catch(e){
     if(my!==reqId) return;
-    days=[]; $('acc').innerHTML=`<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-sm text-slate-300">No pudimos cargar el pronóstico. <b>No mostramos datos inventados.</b><br>Revisa el mar en persona o toca actualizar.</div>`;
+    days=[]; $('strip').innerHTML=''; $('acc').innerHTML=`<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-sm text-slate-300">No pudimos cargar el pronóstico. <b>No mostramos datos inventados.</b><br>Revisa el mar en persona o toca actualizar.</div>`;
     ['mH','mP','mW','mD','mT','mS'].forEach(i=>$(i).textContent='--');
     $('cond').className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border border-slate-700';
     $('cond').textContent='Sin datos'; $('comment').textContent='Sin conexión con el modelo.';
@@ -387,6 +389,25 @@ function windSummary(day){
   return {lvl,max:Math.round(max),mh,label:['Día calmo','Brisa moderada','Día ventoso'][lvl],em:['🟢','🟡','🔴'][lvl],
     calm:best?(best.b===best.e?fmtHour(best.b):`${fmtHour(best.b)} – ${fmtHour(best.e)}`):null};
 }
+function openDay(i){
+  const c=$('c'+i); if(!c) return;
+  if(!c.classList.contains('open')) toggle(i);
+  c.parentElement.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderStrip(){
+  const ab=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'], col=['#34d399','#fbbf24','#fb7185','#94a3b8'], lbl=['Bueno','Regular','Malo','Sin swell'];
+  $('strip').innerHTML=days.map((day,i)=>{
+    const dt=new Date(day.date+'T12:00:00');
+    const max=Math.max(...day.hours.map(x=>x.swH)).toFixed(1);
+    const lvl=Math.min(...day.hours.map(x=>evaluate(x,spotKey).lvl));
+    const w=windSummary(day);
+    return `<button onclick="openDay(${i})" class="shrink-0 w-[88px] rounded-2xl bg-[#101724] border border-slate-800 p-2.5 text-center active:scale-95" style="border-top:3px solid ${col[lvl]}">
+      <div class="text-[11px] text-slate-400">${i===0?'Hoy':ab[dt.getDay()]+' '+dt.getDate()}</div>
+      <div class="fd text-lg font-bold">${max}m</div>
+      <div class="text-[11px] text-slate-200">${lbl[lvl]}</div>
+      <div class="text-[10px] text-slate-400 mt-0.5">${w.em} ${w.max} km/h</div>
+    </button>`}).join('');
+}
 function renderAcc(){
   $('acc').innerHTML=days.map((day,i)=>{
     const max=Math.max(...day.hours.map(x=>x.swH)).toFixed(1);
@@ -417,7 +438,7 @@ function render(){
   const h=limaHour();
   const idx=SHIFTS.findIndex(s=>s.h.includes(h));
   if(days[0]&&days[0].date===limaDate()&&idx>=0&&!render.done){shiftIdx=idx;render.done=true}
-  header(); card_(); renderAcc(); showPeak();
+  header(); card_(); renderAcc(); renderStrip(); showPeak();
 }
 function share(){
   const s=SPOTS[spotKey];
